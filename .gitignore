@@ -1,0 +1,4 @@
+.claude/settings.local.json
+.design-canvas.state.json
+node_modules/
+config.json

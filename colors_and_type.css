@@ -1,0 +1,258 @@
+/* =========================================================================
+   AZUMUTA — Colors & Type
+   Type: Inter (Regular/Medium/Semibold/Bold) — single family across display + body.
+   ========================================================================= */
+
+/* -------- Font loading (Inter only) -------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ===================== COLOR PALETTE ===================== */
+  /* Primary — EXACT values from Brand Guides frame 508 */
+  --az-eggplant-dark:   #28001E;  /* Dark Eggplant · HEX 28001E · CMYK 00 70 20 95 · Pantone 6076C · RAL 4007 */
+  --az-eggplant:        #543341;  /* Bright Eggplant — DEFAULT · RGB 84, 51, 65 */
+  --az-red:             #FF4A2E;  /* HEX FF4A2E · CMYK 0 85 85 0 · Pantone 3516C · RAL 2005 */
+  --az-dark-red:        #B5371E;  /* HEX B5371E · CMYK 0 99 100 19 · Pantone 2350C · RAL 3013 */
+  --az-soft-red:        #FFC8BD;  /* HEX FFC8BD · CMYK 0 21 2 0 · Pantone 196C · RAL 3015 */
+  --az-cream:           #F1EEEC;  /* HEX F1EEEC · CMYK 10 3 0 0 · Pantone 7541C · RAL 9003 */
+
+  /* Secondary */
+  --az-green:           #C8F7C5;  /* Soft green — approved state (from frame samples) */
+  --az-green-strong:    #2FB67C;  /* Emphasis green */
+  --az-blue:            #AAE4F4;  /* Soft blue — info */
+  --az-blue-strong:     #1726EE;  /* Emphasis blue */
+  --az-yellow:          #FBB03B;  /* Warning / highlight */
+
+  /* Neutrals — from brand guides (black → surface white) */
+  --az-black:           #010101;  /* Near-black text on cream */
+  --az-ink:             #01130E;  /* Deep ink (from Vector fills) */
+  --az-graphite:        #141414;
+  --az-slate:           #3B3B3B;
+  --az-steel:           #6A6A6A;
+  --az-line:            #DDDCDA;  /* Warm line/divider */
+  --az-mist:            #E4E1DC;  /* Warm surface */
+  --az-paper:           #F8F6F3;  /* Page background (warm off-white) */
+  --az-surface:         #FFFFFF;  /* Cards */
+
+  /* ===================== SEMANTIC FOREGROUND ===================== */
+  --fg-1:               var(--az-eggplant);   /* primary text on light */
+  --fg-2:               var(--az-ink);        /* body */
+  --fg-3:               var(--az-slate);      /* secondary body */
+  --fg-4:               var(--az-steel);      /* captions / disabled */
+  --fg-on-dark:         var(--az-cream);      /* text on eggplant */
+  --fg-on-red:          var(--az-cream);      /* text on azumuta red */
+  --fg-accent:          var(--az-red);
+
+  /* ===================== SEMANTIC BACKGROUND ===================== */
+  --bg-page:            var(--az-cream);      /* Brand's primary light canvas */
+  --bg-paper:           var(--az-paper);
+  --bg-surface:         var(--az-surface);
+  --bg-surface-2:       var(--az-mist);
+  --bg-inverse:         var(--az-eggplant);
+  --bg-accent:          var(--az-red);
+  --bg-accent-soft:     var(--az-soft-red);
+  --bg-cream:           var(--az-cream);
+
+  /* ===================== STATUS ===================== */
+  --status-success:     var(--az-green-strong);
+  --status-success-bg:  var(--az-green);
+  --status-info:        var(--az-blue-strong);
+  --status-info-bg:     var(--az-blue);
+  --status-warn:        var(--az-yellow);
+  --status-warn-bg:     #FFE8C0;
+  --status-danger:      var(--az-dark-red);
+  --status-danger-bg:   var(--az-soft-red);
+
+  /* ===================== BORDERS ===================== */
+  --border-subtle:      var(--az-line);
+  --border-strong:      var(--az-graphite);
+  --border-accent:      var(--az-red);
+
+  /* ===================== RADII ===================== */
+  --radius-xs:          2px;
+  --radius-sm:          4px;
+  --radius-md:          8px;
+  --radius-lg:          14px;
+  --radius-xl:          24px;
+  --radius-pill:        999px;
+
+  /* ===================== SPACING (4px base) ===================== */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ===================== SHADOWS (soft, warm) ===================== */
+  --shadow-xs: 0 1px 2px rgba(40, 0, 30, 0.04);
+  --shadow-sm: 0 2px 6px rgba(40, 0, 30, 0.06), 0 1px 2px rgba(40,0,30,0.04);
+  --shadow-md: 0 6px 18px rgba(40, 0, 30, 0.08), 0 2px 6px rgba(40,0,30,0.05);
+  --shadow-lg: 0 18px 48px rgba(40, 0, 30, 0.12), 0 6px 16px rgba(40,0,30,0.06);
+
+  /* ===================== TYPE FAMILIES ===================== */
+  /* Display + body both use Inter — no Barlow, no Grotesk. */
+  --font-display: 'Inter', 'Inter Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-condensed: 'Inter', 'Inter Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body:    'Inter', 'Inter Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ===================== TYPE TOKENS ===================== */
+  /* Display — Inter Bold · line-height ~1.05 · mixed case */
+  --display-weight:   700;
+  --display-leading:  1.05;
+  --display-tracking: -0.02em;
+  --display-case:     none;
+
+  /* Body (Inter, line-height 1.5) */
+  --body-leading:     1.5;
+  --body-weight:      400;
+}
+
+/* =========================================================================
+   SEMANTIC TYPE CLASSES
+   ========================================================================= */
+.t-display-xl,
+h1.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(64px, 9vw, 160px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+}
+.t-display-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 6vw, 96px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+}
+.t-display-md {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--fg-1);
+}
+.t-display-sm,
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--fg-1);
+  margin: 0;
+}
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-transform: none;
+  color: var(--fg-1);
+  margin: 0;
+}
+/* Condensed display — for tapestry-style impact text (Acumin substitute) */
+.t-condensed-xl {
+  font-family: var(--font-condensed);
+  font-weight: 900;
+  font-size: clamp(80px, 12vw, 200px);
+  line-height: 0.80;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--fg-1);
+}
+.t-condensed-lg {
+  font-family: var(--font-condensed);
+  font-weight: 900;
+  font-size: clamp(48px, 8vw, 120px);
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: var(--fg-1);
+}
+h3 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--fg-1);
+  margin: 0;
+}
+h4, .t-eyebrow {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin: 0;
+}
+p, .t-body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  margin: 0;
+}
+.t-body-lg {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+.t-body-sm {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fg-3);
+}
+.t-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--fg-2);
+}
+code, .t-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--az-mist);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  color: var(--fg-1);
+}
+
+/* =========================================================================
+   UTILITY — base reset for design-system pages
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--fg-2);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

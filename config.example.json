@@ -1,0 +1,11 @@
+{
+  "database": {
+    "connectionString": "postgresql://user:password@localhost:5432/analytics"
+  },
+  "claude": {
+    "apiKey": "sk-ant-api03-..."
+  },
+  "server": {
+    "port": 3000
+  }
+}
