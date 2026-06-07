@@ -7,7 +7,7 @@ const TONES = {
   light:    { bg: '#fff', headBorder: 'var(--border-subtle)', title: 'var(--az-eggplant)', sub: 'var(--fg-3)', eye: 'var(--fg-3)', dark: false },
 };
 
-function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, onSubmit, onClarifyPick, onToggleSteps, tone = 'dark' }) {
+function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, onSubmit, onClarifyPick, onToggleSteps, tone = 'dark', onClearThread }) {
   const T = TONES[tone] || TONES.dark;
   const scrollRef = uRc(null);
   uEc(() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight; }, [thread, busy]);
@@ -24,7 +24,19 @@ function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, on
               <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: T.sub }}>Builds widgets from your prompts</div>
             </div>
           </div>
-          <i className="ph-light ph-dots-three-vertical" style={{ fontSize: 18, color: T.sub, cursor: 'pointer' }}></i>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {thread.length > 0 && !busy && (
+              <button
+                onClick={onClearThread}
+                title="Clear conversation"
+                style={{ border: 'none', background: T.dark ? 'rgba(241,238,236,0.1)' : 'var(--az-mist)', cursor: 'pointer', padding: '5px 10px', borderRadius: 7, display: 'flex', alignItems: 'center', gap: 5 }}
+              >
+                <i className="ph-light ph-eraser" style={{ fontSize: 14, color: T.sub }}></i>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: T.sub }}>Clear</span>
+              </button>
+            )}
+            <i className="ph-light ph-dots-three-vertical" style={{ fontSize: 18, color: T.sub, cursor: 'pointer' }}></i>
+          </div>
         </div>
         <DataSourceBadge tone={T.dark ? 'dark' : 'light'} />
       </div>

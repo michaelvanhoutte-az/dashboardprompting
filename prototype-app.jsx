@@ -109,6 +109,8 @@ function App() {
     setActiveId(id);
   };
 
+  const clearThread = () => setThreads(t => ({ ...t, [activeId]: [] }));
+
   const deleteWidget = (dashId, wId) => setWidgets(dashId, active.widgets.filter(w => w.id !== wId));
   const onReorder = (fromId, toId) => {
     const a = active.widgets.slice();
@@ -153,6 +155,7 @@ function App() {
         busy={busy} input={input} setInput={setInput} onSubmit={handleSubmit}
         onClarifyPick={(mid, chip) => onClarifyPick(activeId, mid, chip)}
         onToggleSteps={(mid) => patchMsg(activeId, mid, { collapsed: !(thread.find(m => m.id === mid) || {}).collapsed })}
+        onClearThread={clearThread}
       />
       <TweaksPanel>
         <TweakSection label="Assistant" />
