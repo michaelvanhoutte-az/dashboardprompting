@@ -119,15 +119,17 @@ function ResultCard({ title, widgets, chips, onChip, dark, intro }) {
         <div style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, lineHeight: 1.55, color: dark ? 'var(--az-cream)' : 'var(--fg-2)', marginBottom: 10 }}>
           {intro || <>Done — I added <b style={{ color: boldColor }}>{widgets.length} widgets</b> to <b style={{ color: boldColor }}>{title}</b>.</>}
         </div>
-        <div style={{ background: '#fff', border: '1px solid var(--border-subtle)', borderRadius: 12, overflow: 'hidden', marginBottom: 10 }}>
-          {widgets.map((w, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
-              <i className={`ph-light ph-${w.icon}`} style={{ fontSize: 16, color: 'var(--az-red)' }}></i>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, color: 'var(--fg-1)', fontWeight: 500, flex: 1 }}>{w.name}</span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--fg-4)' }}>{w.type}</span>
-            </div>
-          ))}
-        </div>
+        {widgets.length > 0 && (
+          <div style={{ background: '#fff', border: '1px solid var(--border-subtle)', borderRadius: 12, overflow: 'hidden', marginBottom: 10 }}>
+            {widgets.map((w, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+                <i className={`ph-light ph-${w.icon}`} style={{ fontSize: 16, color: 'var(--az-red)' }}></i>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, color: 'var(--fg-1)', fontWeight: 500, flex: 1 }}>{w.name}</span>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--fg-4)' }}>{w.type}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {chips && chips.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
             {chips.map((c, i) => (

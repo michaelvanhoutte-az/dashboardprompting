@@ -1,0 +1,1809 @@
+{
+  "dashboards": [
+    {
+      "id": "dm6wwv",
+      "name": "Instructions by Issue Count",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w2_cmug",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Top Instructions by Issue Count",
+          "sql": "SELECT w.workinstruction_name AS label, COUNT(i.issue_id) AS value FROM issue i JOIN workinstruction w ON i.linked_workinstruction_id = w.workinstruction_id WHERE i.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Toyota inspection Sep 30 Dummy shorter: error during redo + different peripherals for inspection",
+              "v": 797,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "20250507 Double check step level all defined",
+              "v": 449,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy",
+              "v": 314,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy shorter",
+              "v": 251,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "SF/SC/SG - AIM006391-0",
+              "v": 229,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota Dec 3 redo from non-check",
+              "v": 225,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test andon torque",
+              "v": 218,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250130 Toyota tightening result disappears blocking double check",
+              "v": 177,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w3_olcs",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Quality",
+          "title": "Instructions & Issue Breakdown",
+          "sql": "SELECT w.workinstruction_name AS \"Instruction\", COUNT(i.issue_id) AS \"Total Issues\", SUM(CASE WHEN i.archived_at IS NOT NULL THEN 1 ELSE 0 END) AS \"Archived\", SUM(CASE WHEN i.archived_at IS NULL THEN 1 ELSE 0 END) AS \"Open\", SUM(i.open_task_count) AS \"Open Tasks\" FROM issue i JOIN workinstruction w ON i.linked_workinstruction_id = w.workinstruction_id WHERE i.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name ORDER BY \"Total Issues\" DESC LIMIT 10",
+          "columns": [
+            {
+              "key": "Instruction",
+              "label": "Instruction",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Total Issues",
+              "label": "Total Issues",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Archived",
+              "label": "Archived",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Open",
+              "label": "Open",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Open Tasks",
+              "label": "Open Tasks",
+              "mono": false,
+              "align": "left"
+            }
+          ],
+          "rows": [
+            {
+              "Instruction": "Toyota inspection Sep 30 Dummy shorter: error during redo + different peripherals for inspection",
+              "Total Issues": "797",
+              "Archived": "0",
+              "Open": "797",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "20250507 Double check step level all defined",
+              "Total Issues": "449",
+              "Archived": "0",
+              "Open": "449",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "Toyota inspection July 19 Dummy",
+              "Total Issues": "314",
+              "Archived": "0",
+              "Open": "314",
+              "Open Tasks": "7"
+            },
+            {
+              "Instruction": "Toyota inspection July 19 Dummy shorter",
+              "Total Issues": "251",
+              "Archived": "0",
+              "Open": "251",
+              "Open Tasks": "42"
+            },
+            {
+              "Instruction": "SF/SC/SG - AIM006391-0",
+              "Total Issues": "229",
+              "Archived": "0",
+              "Open": "229",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "Toyota Dec 3 redo from non-check",
+              "Total Issues": "225",
+              "Archived": "0",
+              "Open": "225",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "Test andon torque",
+              "Total Issues": "218",
+              "Archived": "0",
+              "Open": "218",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "20250130 Toyota tightening result disappears blocking double check",
+              "Total Issues": "177",
+              "Archived": "0",
+              "Open": "177",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "Test andon torque required tests DEV 2270 NOK submit test",
+              "Total Issues": "117",
+              "Archived": "0",
+              "Open": "117",
+              "Open Tasks": "0"
+            },
+            {
+              "Instruction": "20250619 Non-blocking andon",
+              "Total Issues": "79",
+              "Archived": "0",
+              "Open": "79",
+              "Open Tasks": "0"
+            }
+          ]
+        },
+        {
+          "id": "w4_tpy8",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Quality",
+          "title": "Instructions Linked to Issues",
+          "sql": "SELECT COUNT(DISTINCT i.linked_workinstruction_id) AS value FROM issue i WHERE i.linked_workinstruction_id IS NOT NULL AND i.deleted_at IS NULL",
+          "label": "Instructions Linked to Issues",
+          "value": "125",
+          "delta": null,
+          "trend": "flat",
+          "icon": "clipboard-text"
+        },
+        {
+          "id": "w5_7uyk",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Quality",
+          "title": "Total Issues Linked to Instructions",
+          "sql": "SELECT COUNT(*) AS value FROM issue i WHERE i.linked_workinstruction_id IS NOT NULL AND i.deleted_at IS NULL",
+          "label": "Total Issues Linked to Instructions",
+          "value": "4,031",
+          "delta": null,
+          "trend": "flat",
+          "icon": "warning"
+        }
+      ]
+    },
+    {
+      "id": "untitled",
+      "name": "Operator Speed vs. Step Average",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w1_jv99",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Performance",
+          "title": "Operator Step Time vs. Step Average",
+          "sql": "SELECT\n  s.step_name AS \"Step\",\n  s.block_name AS \"Block\",\n  COALESCE(u.first_name || ' ' || u.last_name, r.executor_id) AS \"Operator\",\n  ROUND(AVG(v.actual_duration) / 1000.0) AS \"Avg Time (s)\",\n  ROUND(AVG(AVG(v.actual_duration)) OVER (PARTITION BY v.instruction_step_id) / 1000.0) AS \"Step Avg (s)\",\n  ROUND(\n    (AVG(v.actual_duration) - AVG(AVG(v.actual_duration)) OVER (PARTITION BY v.instruction_step_id))\n    / NULLIF(AVG(AVG(v.actual_duration)) OVER (PARTITION BY v.instruction_step_id), 0) * 100\n  ) AS \"Delta (%)\"\nFROM instruction_visit v\nJOIN recording r ON r.recording_id = v.recording_id\nJOIN instruction_step s ON s.step_id = v.instruction_step_id\nLEFT JOIN users u ON u.user_id = r.executor_id\nWHERE\n  v.deleted_at IS NULL\n  AND r.deleted_at IS NULL\n  AND s.deleted_at IS NULL\n  AND v.actual_duration IS NOT NULL\n  AND v.actual_duration > 0\n  AND r.executor_id IS NOT NULL\nGROUP BY\n  v.instruction_step_id,\n  s.step_name,\n  s.block_name,\n  r.executor_id,\n  u.first_name,\n  u.last_name\nHAVING COUNT(*) >= 3\nORDER BY \"Delta (%)\" DESC NULLS LAST\nLIMIT 50",
+          "columns": [
+            {
+              "key": "Step",
+              "label": "Step",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Block",
+              "label": "Block",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Operator",
+              "label": "Operator",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Avg Time (s)",
+              "label": "Avg Time (S)",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Step Avg (s)",
+              "label": "Step Avg (S)",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Delta (%)",
+              "label": "Delta (%)",
+              "mono": false,
+              "align": "left"
+            }
+          ],
+          "rows": [
+            {
+              "Step": "3 bolts 7.1 Nm blocking inspection",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "4176",
+              "Step Avg (s)": "2107",
+              "Delta (%)": "98"
+            },
+            {
+              "Step": "Blocking check 4: 2 bolts",
+              "Block": "20250918 Toyota sequence last bolt failing, navigation fails",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "5142",
+              "Step Avg (s)": "2593",
+              "Delta (%)": "98"
+            },
+            {
+              "Step": "4 bolts 7.2 Nm other error (no inspection)",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "923",
+              "Step Avg (s)": "473",
+              "Delta (%)": "95"
+            },
+            {
+              "Step": "4 bolts 25 Nm non-blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "2056",
+              "Step Avg (s)": "1055",
+              "Delta (%)": "95"
+            },
+            {
+              "Step": "Number check with double check blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "167",
+              "Step Avg (s)": "85",
+              "Delta (%)": "95"
+            },
+            {
+              "Step": "4 bolts 25 Nm",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "146",
+              "Step Avg (s)": "76",
+              "Delta (%)": "91"
+            },
+            {
+              "Step": "4 bolts 7.2 Nm other error (no inspection)",
+              "Block": "Toyota inspection July 19",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "102",
+              "Step Avg (s)": "54",
+              "Delta (%)": "89"
+            },
+            {
+              "Step": "3 bolts 7 Nm",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "157",
+              "Step Avg (s)": "83",
+              "Delta (%)": "88"
+            },
+            {
+              "Step": "Check 4 blocking",
+              "Block": "Skipping double checks",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "203",
+              "Step Avg (s)": "110",
+              "Delta (%)": "84"
+            },
+            {
+              "Step": "Final number check with double check blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "78",
+              "Step Avg (s)": "42",
+              "Delta (%)": "84"
+            },
+            {
+              "Step": "3 bolts 7.1 Nm blocking double-check (seminarie)",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "42",
+              "Step Avg (s)": "23",
+              "Delta (%)": "83"
+            },
+            {
+              "Step": "Step 3",
+              "Block": "20251103 Audit creating issues",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "18",
+              "Step Avg (s)": "10",
+              "Delta (%)": "82"
+            },
+            {
+              "Step": "3 bolts 7 Nm inspection",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "852",
+              "Step Avg (s)": "477",
+              "Delta (%)": "79"
+            },
+            {
+              "Step": "4 bolts 25 Nm torque (without inspection)",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "102",
+              "Step Avg (s)": "59",
+              "Delta (%)": "73"
+            },
+            {
+              "Step": "Number check with double check non-blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "6",
+              "Step Avg (s)": "4",
+              "Delta (%)": "72"
+            },
+            {
+              "Step": "3 bolts 7.1 Nm inspection other error",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "137",
+              "Step Avg (s)": "82",
+              "Delta (%)": "66"
+            },
+            {
+              "Step": "3 bolts 7 Nm inspection high torque",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "118",
+              "Step Avg (s)": "72",
+              "Delta (%)": "63"
+            },
+            {
+              "Step": "Number check with double check non-blocking 2",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "8",
+              "Step Avg (s)": "5",
+              "Delta (%)": "60"
+            },
+            {
+              "Step": "Step 1",
+              "Block": "20251103 Audit creating issues",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "10",
+              "Step Avg (s)": "6",
+              "Delta (%)": "58"
+            },
+            {
+              "Step": "Number check with double non-blocking",
+              "Block": "Offline double checks without peripherals",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "988",
+              "Step Avg (s)": "631",
+              "Delta (%)": "57"
+            },
+            {
+              "Step": "Standard number check",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "11",
+              "Step Avg (s)": "7",
+              "Delta (%)": "54"
+            },
+            {
+              "Step": "3 bolts 7.1 Nm inspection other error",
+              "Block": "Toyota inspection July 19",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "115",
+              "Step Avg (s)": "75",
+              "Delta (%)": "54"
+            },
+            {
+              "Step": "Number check with double check non-blocking 2",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "9",
+              "Step Avg (s)": "6",
+              "Delta (%)": "53"
+            },
+            {
+              "Step": "B",
+              "Block": null,
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "1",
+              "Step Avg (s)": "0",
+              "Delta (%)": "53"
+            },
+            {
+              "Step": "Number check with double check non-blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "3",
+              "Step Avg (s)": "2",
+              "Delta (%)": "51"
+            },
+            {
+              "Step": "Step 2",
+              "Block": "20251103 Audit creating issues",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "16",
+              "Step Avg (s)": "11",
+              "Delta (%)": "45"
+            },
+            {
+              "Step": "3 bolts 7 Nm inspection high torque",
+              "Block": "Toyota inspection July 19",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "54",
+              "Step Avg (s)": "38",
+              "Delta (%)": "44"
+            },
+            {
+              "Step": "Final number check with double check blocking",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "BGA1029 SyncedDDDDDDDD",
+              "Avg Time (s)": "2572",
+              "Step Avg (s)": "1785",
+              "Delta (%)": "44"
+            },
+            {
+              "Step": "3 bolts 7.1 Nm blocking double-check",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "52",
+              "Step Avg (s)": "36",
+              "Delta (%)": "43"
+            },
+            {
+              "Step": "C",
+              "Block": null,
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "0",
+              "Step Avg (s)": "0",
+              "Delta (%)": "41"
+            },
+            {
+              "Step": "Other step",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "33",
+              "Step Avg (s)": "23",
+              "Delta (%)": "40"
+            },
+            {
+              "Step": "A",
+              "Block": null,
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "3",
+              "Step Avg (s)": "2",
+              "Delta (%)": "39"
+            },
+            {
+              "Step": "Number check with double check non-blocking 2",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "4",
+              "Step Avg (s)": "3",
+              "Delta (%)": "36"
+            },
+            {
+              "Step": "3 bolts 7 Nm inspection high torque",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "1417",
+              "Step Avg (s)": "1096",
+              "Delta (%)": "29"
+            },
+            {
+              "Step": "4 bolts 7 Nm no inspection with errors",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "42",
+              "Step Avg (s)": "33",
+              "Delta (%)": "28"
+            },
+            {
+              "Step": "3 bolts 7 Nm inspection other error",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "31",
+              "Step Avg (s)": "25",
+              "Delta (%)": "23"
+            },
+            {
+              "Step": "D",
+              "Block": null,
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "1",
+              "Step Avg (s)": "0",
+              "Delta (%)": "21"
+            },
+            {
+              "Step": "E",
+              "Block": null,
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "1",
+              "Step Avg (s)": "0",
+              "Delta (%)": "20"
+            },
+            {
+              "Step": "Standard number check",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "4",
+              "Step Avg (s)": "4",
+              "Delta (%)": "20"
+            },
+            {
+              "Step": null,
+              "Block": null,
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "1",
+              "Step Avg (s)": "1",
+              "Delta (%)": "19"
+            },
+            {
+              "Step": "Number check with double check blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "3",
+              "Step Avg (s)": "2",
+              "Delta (%)": "19"
+            },
+            {
+              "Step": "4 bolts 7.2 Nm (no inspection)",
+              "Block": "Toyota inspection July 19 Dummy Shorter",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "312",
+              "Step Avg (s)": "263",
+              "Delta (%)": "19"
+            },
+            {
+              "Step": "3 bolts 7 Nm Non-blocking double-check",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "38",
+              "Step Avg (s)": "34",
+              "Delta (%)": "13"
+            },
+            {
+              "Step": "Number check with double blocking",
+              "Block": "Offline double checks without peripherals",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "9",
+              "Step Avg (s)": "8",
+              "Delta (%)": "12"
+            },
+            {
+              "Step": "Number check with double check blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "4",
+              "Step Avg (s)": "3",
+              "Delta (%)": "11"
+            },
+            {
+              "Step": "Number check with double check non-blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "2",
+              "Step Avg (s)": "2",
+              "Delta (%)": "8"
+            },
+            {
+              "Step": "3 bolts 7 Nm Non-blocking double-check (All)",
+              "Block": "Toyota Oct 22: redo work",
+              "Operator": "Simon Operator Kluyskens",
+              "Avg Time (s)": "331",
+              "Step Avg (s)": "305",
+              "Delta (%)": "8"
+            },
+            {
+              "Step": "F",
+              "Block": null,
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "1",
+              "Step Avg (s)": "0",
+              "Delta (%)": "7"
+            },
+            {
+              "Step": "4 bolts 25 Nm blocking",
+              "Block": "Toyota inspection July 19",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "28",
+              "Step Avg (s)": "28",
+              "Delta (%)": "1"
+            },
+            {
+              "Step": "Setting some parameters a=0.05, b=0.04",
+              "Block": "20250227 Floating point errors",
+              "Operator": "Simon Vannestex",
+              "Avg Time (s)": "2",
+              "Step Avg (s)": "2",
+              "Delta (%)": "0"
+            }
+          ]
+        }
+      ],
+      "thread": null
+    },
+    {
+      "id": "prod",
+      "name": "Production Overview",
+      "icon": "chart-line-up",
+      "pinned": true,
+      "widgets": [
+        {
+          "id": "w1_qlyp",
+          "type": "kpi",
+          "span": 1,
+          "label": "First-pass yield",
+          "value": "98.7",
+          "unit": "%",
+          "delta": "+0.4 vs last week",
+          "trend": "up",
+          "icon": "target",
+          "spark": [
+            97.9,
+            98.1,
+            97.8,
+            98.4,
+            98.2,
+            98.6,
+            98.7
+          ]
+        },
+        {
+          "id": "w2_3des",
+          "type": "kpi",
+          "span": 1,
+          "label": "OEE",
+          "value": "82.4",
+          "unit": "%",
+          "delta": "+1.8 this shift",
+          "trend": "up",
+          "icon": "gauge",
+          "spark": [
+            78,
+            79.5,
+            80,
+            79,
+            81,
+            81.8,
+            82.4
+          ]
+        },
+        {
+          "id": "w3_ntij",
+          "type": "kpi",
+          "span": 1,
+          "label": "Units today",
+          "value": "1,284",
+          "delta": "92% of target",
+          "trend": "up",
+          "icon": "package",
+          "spark": [
+            820,
+            940,
+            1010,
+            1120,
+            1180,
+            1240,
+            1284
+          ]
+        },
+        {
+          "id": "w4_w35a",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Workforce",
+          "title": "Active Operators This Week",
+          "sql": "SELECT COUNT(DISTINCT executor_id) AS value FROM recording WHERE executor_id IS NOT NULL AND started_at >= date_trunc('week', CURRENT_DATE) AND deleted_at IS NULL",
+          "label": "Active Operators This Week",
+          "value": "0",
+          "unit": "operators",
+          "delta": null,
+          "trend": "flat",
+          "icon": "users"
+        },
+        {
+          "id": "w5_nnhe",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "OEE trend · 7 days",
+          "badgeText": "vs 85% target",
+          "badgeVariant": "neutral",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "target": 85,
+          "series": [
+            {
+              "data": [
+                78,
+                79.5,
+                80,
+                79,
+                81,
+                81.8,
+                82.4
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w6_gyiz",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Defects by station",
+          "badgeText": "Top: Leak test",
+          "badgeVariant": "danger",
+          "data": [
+            {
+              "l": "Torque",
+              "v": 14,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Weld",
+              "v": 9,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Leak",
+              "v": 22,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Harness",
+              "v": 6,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Final QC",
+              "v": 11,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w7_1um8",
+          "type": "donut",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Scrap reasons",
+          "centerValue": "3.1%",
+          "centerLabel": "Scrap rate",
+          "data": [
+            {
+              "l": "Material flaw",
+              "v": 38,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Mis-assembly",
+              "v": 27,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Calibration",
+              "v": 21,
+              "c": "var(--az-yellow)"
+            },
+            {
+              "l": "Other",
+              "v": 14,
+              "c": "var(--az-mist)"
+            }
+          ]
+        },
+        {
+          "id": "w9_5iz2",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Quality",
+          "title": "Recent audits",
+          "columns": [
+            {
+              "key": "when",
+              "label": "Time",
+              "w": "70px",
+              "mono": true
+            },
+            {
+              "key": "audit",
+              "label": "Audit"
+            },
+            {
+              "key": "line",
+              "label": "Line",
+              "w": "110px"
+            },
+            {
+              "key": "who",
+              "label": "Operator",
+              "w": "130px"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "w": "110px",
+              "align": "right"
+            }
+          ],
+          "rows": [
+            {
+              "when": "14:08",
+              "audit": "Daily safety walk",
+              "line": "Line 3",
+              "who": "Marta K.",
+              "result": "Pass"
+            },
+            {
+              "when": "13:51",
+              "audit": "Torque calibration",
+              "line": "Line 1",
+              "who": "Jan P.",
+              "result": "Flag"
+            },
+            {
+              "when": "13:22",
+              "audit": "5S workplace check",
+              "line": "Line 2",
+              "who": "Sam B.",
+              "result": "Pass"
+            },
+            {
+              "when": "12:45",
+              "audit": "Leak-test SOP",
+              "line": "Line 2",
+              "who": "Lena R.",
+              "result": "Review"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "name": "Quality & Scrap",
+      "icon": "shield-check",
+      "pinned": true,
+      "widgets": [
+        {
+          "id": "w10_sokn",
+          "type": "kpi",
+          "span": 1,
+          "label": "First-pass yield",
+          "value": "98.7",
+          "unit": "%",
+          "delta": "+0.4 vs last week",
+          "trend": "up",
+          "icon": "target",
+          "spark": [
+            97.9,
+            98.1,
+            97.8,
+            98.4,
+            98.2,
+            98.6,
+            98.7
+          ]
+        },
+        {
+          "id": "w11_xac2",
+          "type": "kpi",
+          "span": 1,
+          "label": "Scrap rate",
+          "value": "3.1",
+          "unit": "%",
+          "delta": "-0.4 vs target",
+          "trend": "down",
+          "icon": "trash",
+          "spark": [
+            4,
+            3.8,
+            3.6,
+            3.5,
+            3.3,
+            3.2,
+            3.1
+          ]
+        },
+        {
+          "id": "w12_5kvz",
+          "type": "kpi",
+          "span": 1,
+          "label": "Open defects",
+          "value": "12",
+          "delta": "-3 this shift",
+          "trend": "down",
+          "icon": "warning",
+          "spark": [
+            19,
+            18,
+            16,
+            15,
+            14,
+            13,
+            12
+          ]
+        },
+        {
+          "id": "w13_fv2j",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Defect Pareto · this month",
+          "badgeText": "80% from 3 causes",
+          "badgeVariant": "warn",
+          "data": [
+            {
+              "l": "Leak",
+              "v": 42,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Torque",
+              "v": 28,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Solder",
+              "v": 19,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Fit",
+              "v": 11,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Other",
+              "v": 6,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w14_te7f",
+          "type": "donut",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Scrap reasons",
+          "centerValue": "3.1%",
+          "centerLabel": "Scrap rate",
+          "data": [
+            {
+              "l": "Material flaw",
+              "v": 38,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Mis-assembly",
+              "v": 27,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Calibration",
+              "v": 21,
+              "c": "var(--az-yellow)"
+            },
+            {
+              "l": "Other",
+              "v": 14,
+              "c": "var(--az-mist)"
+            }
+          ]
+        },
+        {
+          "id": "w15_r1oe",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Quality",
+          "title": "Recent audits",
+          "columns": [
+            {
+              "key": "when",
+              "label": "Time",
+              "w": "70px",
+              "mono": true
+            },
+            {
+              "key": "audit",
+              "label": "Audit"
+            },
+            {
+              "key": "line",
+              "label": "Line",
+              "w": "110px"
+            },
+            {
+              "key": "who",
+              "label": "Operator",
+              "w": "130px"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "w": "110px",
+              "align": "right"
+            }
+          ],
+          "rows": [
+            {
+              "when": "14:08",
+              "audit": "Daily safety walk",
+              "line": "Line 3",
+              "who": "Marta K.",
+              "result": "Pass"
+            },
+            {
+              "when": "13:51",
+              "audit": "Torque calibration",
+              "line": "Line 1",
+              "who": "Jan P.",
+              "result": "Flag"
+            },
+            {
+              "when": "13:22",
+              "audit": "5S workplace check",
+              "line": "Line 2",
+              "who": "Sam B.",
+              "result": "Pass"
+            },
+            {
+              "when": "12:45",
+              "audit": "Leak-test SOP",
+              "line": "Line 2",
+              "who": "Lena R.",
+              "result": "Review"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "line3",
+      "name": "Line 3 · Shift A",
+      "icon": "gauge",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w16_73op",
+          "type": "kpi",
+          "span": 1,
+          "label": "OEE",
+          "value": "82.4",
+          "unit": "%",
+          "delta": "+1.8 this shift",
+          "trend": "up",
+          "icon": "gauge",
+          "spark": [
+            78,
+            79.5,
+            80,
+            79,
+            81,
+            81.8,
+            82.4
+          ]
+        },
+        {
+          "id": "w17_qba9",
+          "type": "kpi",
+          "span": 1,
+          "label": "Units today",
+          "value": "1,284",
+          "delta": "92% of target",
+          "trend": "up",
+          "icon": "package",
+          "spark": [
+            820,
+            940,
+            1010,
+            1120,
+            1180,
+            1240,
+            1284
+          ]
+        },
+        {
+          "id": "w18_j3bu",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "OEE trend · 7 days",
+          "badgeText": "vs 85% target",
+          "badgeVariant": "neutral",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "target": 85,
+          "series": [
+            {
+              "data": [
+                78,
+                79.5,
+                80,
+                79,
+                81,
+                81.8,
+                82.4
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w19_xk93",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Defects by station",
+          "badgeText": "Top: Leak test",
+          "badgeVariant": "danger",
+          "data": [
+            {
+              "l": "Torque",
+              "v": 14,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Weld",
+              "v": 9,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Leak",
+              "v": 22,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Harness",
+              "v": 6,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Final QC",
+              "v": 11,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "name": "Training & Skills",
+      "icon": "graduation-cap",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w20_21dm",
+          "type": "kpi",
+          "span": 1,
+          "label": "Operators certified",
+          "value": "78",
+          "unit": "%",
+          "delta": "+5 this quarter",
+          "trend": "up",
+          "icon": "seal-check",
+          "spark": [
+            68,
+            70,
+            71,
+            73,
+            74,
+            76,
+            78
+          ]
+        },
+        {
+          "id": "w21_n1j7",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Skills",
+          "title": "Certification gaps by line",
+          "badgeText": "Line 2 lagging",
+          "badgeVariant": "warn",
+          "data": [
+            {
+              "l": "Line 1",
+              "v": 12,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Line 2",
+              "v": 31,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Line 3",
+              "v": 8,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Line 4",
+              "v": 17,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w22_9qfk",
+          "type": "heatmap",
+          "span": 2,
+          "eyebrow": "Skills",
+          "title": "Training completion",
+          "accent": true,
+          "cols": [
+            "Torque",
+            "Weld",
+            "Leak",
+            "Final QC"
+          ],
+          "rows": [
+            {
+              "label": "Line 1 · Assembly",
+              "values": [
+                0.95,
+                0.8,
+                0.6,
+                0.9
+              ]
+            },
+            {
+              "label": "Line 2 · Welding",
+              "values": [
+                0.7,
+                0.92,
+                0.4,
+                0.75
+              ]
+            },
+            {
+              "label": "Line 3 · Final QC",
+              "values": [
+                0.85,
+                0.55,
+                0.88,
+                0.96
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "downtime",
+      "name": "Downtime Watch",
+      "icon": "timer",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w23_dz7o",
+          "type": "kpi",
+          "span": 1,
+          "label": "Downtime today",
+          "value": "47",
+          "unit": "min",
+          "delta": "+12 vs avg",
+          "trend": "up",
+          "icon": "timer",
+          "spark": [
+            22,
+            28,
+            24,
+            30,
+            35,
+            41,
+            47
+          ]
+        },
+        {
+          "id": "w24_c08a",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Downtime · 7 days",
+          "badgeText": "minutes / day",
+          "badgeVariant": "neutral",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "series": [
+            {
+              "data": [
+                22,
+                28,
+                24,
+                30,
+                35,
+                41,
+                47
+              ],
+              "color": "var(--az-dark-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w25_tx30",
+          "type": "table",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Top stoppages",
+          "columns": [
+            {
+              "key": "cause",
+              "label": "Cause"
+            },
+            {
+              "key": "line",
+              "label": "Line",
+              "w": "90px"
+            },
+            {
+              "key": "mins",
+              "label": "Min",
+              "w": "70px",
+              "align": "right",
+              "mono": true
+            },
+            {
+              "key": "count",
+              "label": "Events",
+              "w": "80px",
+              "align": "right",
+              "mono": true
+            }
+          ],
+          "rows": [
+            {
+              "cause": "Material wait",
+              "line": "Line 2",
+              "mins": 18,
+              "count": 4
+            },
+            {
+              "cause": "Tool change",
+              "line": "Line 1",
+              "mins": 12,
+              "count": 6
+            },
+            {
+              "cause": "Jam · conveyor",
+              "line": "Line 3",
+              "mins": 9,
+              "count": 3
+            },
+            {
+              "cause": "Calibration",
+              "line": "Line 2",
+              "mins": 8,
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audits",
+      "name": "Audit Tracker",
+      "icon": "check-square",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w26_37fu",
+          "type": "kpi",
+          "span": 1,
+          "label": "Audit pass rate",
+          "value": "94",
+          "unit": "%",
+          "delta": "+2 this month",
+          "trend": "up",
+          "icon": "check-square",
+          "spark": [
+            88,
+            90,
+            89,
+            91,
+            92,
+            93,
+            94
+          ]
+        },
+        {
+          "id": "w27_zq5q",
+          "type": "donut",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Audit outcomes · 30 days",
+          "centerValue": "94%",
+          "centerLabel": "Pass rate",
+          "data": [
+            {
+              "l": "Pass",
+              "v": 188,
+              "c": "var(--az-green-strong)"
+            },
+            {
+              "l": "Review",
+              "v": 9,
+              "c": "var(--az-yellow)"
+            },
+            {
+              "l": "Flag",
+              "v": 4,
+              "c": "var(--az-dark-red)"
+            }
+          ]
+        },
+        {
+          "id": "w28_omp9",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Quality",
+          "title": "Recent audits",
+          "columns": [
+            {
+              "key": "when",
+              "label": "Time",
+              "w": "70px",
+              "mono": true
+            },
+            {
+              "key": "audit",
+              "label": "Audit"
+            },
+            {
+              "key": "line",
+              "label": "Line",
+              "w": "110px"
+            },
+            {
+              "key": "who",
+              "label": "Operator",
+              "w": "130px"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "w": "110px",
+              "align": "right"
+            }
+          ],
+          "rows": [
+            {
+              "when": "14:08",
+              "audit": "Daily safety walk",
+              "line": "Line 3",
+              "who": "Marta K.",
+              "result": "Pass"
+            },
+            {
+              "when": "13:51",
+              "audit": "Torque calibration",
+              "line": "Line 1",
+              "who": "Jan P.",
+              "result": "Flag"
+            },
+            {
+              "when": "13:22",
+              "audit": "5S workplace check",
+              "line": "Line 2",
+              "who": "Sam B.",
+              "result": "Pass"
+            },
+            {
+              "when": "12:45",
+              "audit": "Leak-test SOP",
+              "line": "Line 2",
+              "who": "Lena R.",
+              "result": "Review"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oee-deep",
+      "name": "OEE Deep-dive",
+      "icon": "chart-donut",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w29_5nil",
+          "type": "kpi",
+          "span": 1,
+          "label": "OEE",
+          "value": "82.4",
+          "unit": "%",
+          "delta": "+1.8 this shift",
+          "trend": "up",
+          "icon": "gauge",
+          "spark": [
+            78,
+            79.5,
+            80,
+            79,
+            81,
+            81.8,
+            82.4
+          ]
+        },
+        {
+          "id": "w30_a7a3",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "OEE trend · 7 days",
+          "badgeText": "vs 85% target",
+          "badgeVariant": "neutral",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "target": 85,
+          "series": [
+            {
+              "data": [
+                78,
+                79.5,
+                80,
+                79,
+                81,
+                81.8,
+                82.4
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w31_b9xs",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Downtime · 7 days",
+          "badgeText": "minutes / day",
+          "badgeVariant": "neutral",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "series": [
+            {
+              "data": [
+                22,
+                28,
+                24,
+                30,
+                35,
+                41,
+                47
+              ],
+              "color": "var(--az-dark-red)",
+              "fill": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "weekly",
+      "name": "Weekly Ops Review",
+      "icon": "calendar-check",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w32_g764",
+          "type": "kpi",
+          "span": 1,
+          "label": "First-pass yield",
+          "value": "98.7",
+          "unit": "%",
+          "delta": "+0.4 vs last week",
+          "trend": "up",
+          "icon": "target",
+          "spark": [
+            97.9,
+            98.1,
+            97.8,
+            98.4,
+            98.2,
+            98.6,
+            98.7
+          ]
+        },
+        {
+          "id": "w33_32o6",
+          "type": "kpi",
+          "span": 1,
+          "label": "OEE",
+          "value": "82.4",
+          "unit": "%",
+          "delta": "+1.8 this shift",
+          "trend": "up",
+          "icon": "gauge",
+          "spark": [
+            78,
+            79.5,
+            80,
+            79,
+            81,
+            81.8,
+            82.4
+          ]
+        },
+        {
+          "id": "w34_904a",
+          "type": "kpi",
+          "span": 1,
+          "label": "Units today",
+          "value": "1,284",
+          "delta": "92% of target",
+          "trend": "up",
+          "icon": "package",
+          "spark": [
+            820,
+            940,
+            1010,
+            1120,
+            1180,
+            1240,
+            1284
+          ]
+        },
+        {
+          "id": "w35_xoio",
+          "type": "kpi",
+          "span": 1,
+          "label": "Scrap rate",
+          "value": "3.1",
+          "unit": "%",
+          "delta": "-0.4 vs target",
+          "trend": "down",
+          "icon": "trash",
+          "spark": [
+            4,
+            3.8,
+            3.6,
+            3.5,
+            3.3,
+            3.2,
+            3.1
+          ]
+        },
+        {
+          "id": "w36_7618",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "First-pass yield · 7 days",
+          "labels": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
+          "series": [
+            {
+              "data": [
+                97.9,
+                98.1,
+                97.8,
+                98.4,
+                98.2,
+                98.6,
+                98.7
+              ],
+              "color": "var(--az-green-strong)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w37_tup7",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Quality",
+          "title": "Defect Pareto · this month",
+          "badgeText": "80% from 3 causes",
+          "badgeVariant": "warn",
+          "data": [
+            {
+              "l": "Leak",
+              "v": 42,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Torque",
+              "v": 28,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Solder",
+              "v": 19,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Fit",
+              "v": 11,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Other",
+              "v": 6,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
