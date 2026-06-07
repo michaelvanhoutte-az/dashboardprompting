@@ -5,6 +5,49 @@ let _uid = 0;
 const uid = () => 'm' + (++_uid) + Date.now().toString(36).slice(-3);
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+const CHAT_STEPS = [
+  'Understanding your request',
+  'Checking available data',
+  'Choosing the right widgets',
+  'Building your dashboard',
+];
+
+async function* streamChat(body) {
+  let res;
+  try {
+    res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    yield { event: 'error', data: { message: 'Could not reach server: ' + err.message } };
+    return;
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({ message: 'Server error ' + res.status }));
+    yield { event: 'error', data };
+    return;
+  }
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', ev = null;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (line.startsWith('event: ')) { ev = line.slice(7).trim(); }
+      else if (line.startsWith('data: ') && ev) {
+        try { yield { event: ev, data: JSON.parse(line.slice(6)) }; } catch (_) {}
+        ev = null;
+      }
+    }
+  }
+}
+
 const NAME_ICON = {
   'Production Overview': 'chart-line-up', 'Defects & Scrap': 'shield-warning', 'Training & Skills': 'graduation-cap',
   'Downtime Watch': 'timer', 'Audit Tracker': 'check-square', 'Yield': 'target', 'Operations Overview': 'squares-four',
@@ -13,9 +56,29 @@ const NAME_ICON = {
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accent": "#FF4A2E",
   "panelTone": "dark",
-  "speed": 1,
   "density": "comfortable"
 }/*EDITMODE-END*/;
+
+function buildHistory(thread) {
+  const result = [];
+  for (const m of thread) {
+    if (m.role === 'user') result.push({ role: 'user', text: m.text });
+    else if (m.role === 'clarify') result.push({ role: 'assistant', text: m.question });
+    else if (m.role === 'assistant') result.push({ role: 'assistant', text: m.text });
+    else if (m.role === 'result') result.push({ role: 'assistant', text: m.intro || 'Done — widgets added.' });
+    // skip: steps, error
+  }
+  // Merge consecutive same-role entries (can happen when steps are skipped)
+  const merged = [];
+  for (const m of result) {
+    if (merged.length && merged[merged.length - 1].role === m.role) {
+      merged[merged.length - 1].text += '\n' + m.text;
+    } else {
+      merged.push({ ...m });
+    }
+  }
+  return merged.slice(-12); // keep last 12 turns max
+}
 
 /* ============================ APP ============================ */
 function App() {
@@ -28,10 +91,12 @@ function App() {
   const [input, setInput] = uS('');
   const [building, setBuilding] = uS(null);   // { dashId, specs:[] }
   const [dragId, setDragId] = uS(null);
+  const [focusedWidget, setFocusedWidget] = uS(null);
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const configLoaded = uR(false);
+  const saveTimer = uR(null);
 
   const active = dashboards.find(d => d.id === activeId) || dashboards[0];
-  const stepMs = Math.round(720 / (t.speed || 1));
 
   /* ---- thread helpers ---- */
   const appendMsg = (dashId, msg) => setThreads(t => ({ ...t, [dashId]: [...(t[dashId] || []), msg] }));
@@ -43,60 +108,74 @@ function App() {
   const renameDash = (dashId, name) => setDashboards(ds => ds.map(d => d.id === dashId ? { ...d, name, icon: NAME_ICON[name] || d.icon } : d));
   const togglePin = (dashId) => setDashboards(ds => ds.map(d => d.id === dashId ? { ...d, pinned: !d.pinned } : d));
 
-  /* ---- animation runners ---- */
-  async function animateSteps(dashId, mid, n, buildSpecs) {
-    for (let i = 0; i < n; i++) {
-      setStep(dashId, mid, i, 'active');
-      if (buildSpecs && i === n - 1) setBuilding({ dashId, specs: buildSpecs });
-      await sleep(stepMs);
-      setStep(dashId, mid, i, 'done');
-      await sleep(110);
-    }
-  }
-
-  async function runClarify(dashId, plan) {
-    const mid = uid();
-    appendMsg(dashId, { id: mid, role: 'steps', steps: plan.preSteps.map(s => ({ ...s, state: 'pending' })), collapsed: false });
-    await animateSteps(dashId, mid, plan.preSteps.length, null);
-    patchMsg(dashId, mid, { collapsed: true });
-    appendMsg(dashId, { id: uid(), role: 'clarify', question: plan.question, chips: plan.chips, footnote: plan.footnote, answered: false });
-  }
-
-  async function runBuild(dashId, plan, isEmpty, prevWidgets) {
-    const mid = uid();
-    appendMsg(dashId, { id: mid, role: 'steps', steps: plan.steps.map(s => ({ ...s, state: 'pending' })), collapsed: false });
-    const newCount = isEmpty ? plan.widgets.length : Math.max(0, plan.widgets.length - prevWidgets.length);
-    const newSpecs = newCount > 0 ? plan.widgets.slice(plan.widgets.length - newCount) : null;
-    await animateSteps(dashId, mid, plan.steps.length, newSpecs);
-    setBuilding(null);
-    setWidgets(dashId, plan.widgets);
-    if (isEmpty && plan.renameIfEmpty) renameDash(dashId, plan.dashboardName);
-    patchMsg(dashId, mid, { collapsed: true });
-    const finalWidgets = plan.widgets;
-    appendMsg(dashId, {
-      id: uid(), role: 'result',
-      title: isEmpty ? plan.dashboardName : (dashboards.find(d => d.id === dashId) || {}).name,
-      widgets: plan.summary || null,
-      intro: plan.text || null,
-      chips: followupChips(finalWidgets),
-    });
-  }
-
   const handleSubmit = uCb(async (text) => {
-    const t = (text || '').trim();
-    if (!t || busy) return;
+    const msg = (text || '').trim();
+    if (!msg || busy) return;
     const dashId = activeId;
     const dash = dashboards.find(d => d.id === dashId);
-    appendMsg(dashId, { id: uid(), role: 'user', text: t });
+    const currentFocused = focusedWidget; // capture at submission time
+    const history = buildHistory(threads[dashId] || []);
+    appendMsg(dashId, { id: uid(), role: 'user', text: msg });
     setInput('');
     setBusy(true);
-    await sleep(260);
-    const isEmpty = dash.widgets.length === 0;
-    const plan = isEmpty ? planPrompt(t, { dashboardEmpty: dash.name.startsWith('Untitled') }) : planFollowup(t, dash.widgets);
-    if (plan.kind === 'clarify') { await runClarify(dashId, plan); }
-    else { await runBuild(dashId, plan, isEmpty, dash.widgets); }
+
+    const stepsMid = uid();
+    appendMsg(dashId, {
+      id: stepsMid, role: 'steps',
+      steps: CHAT_STEPS.map(label => ({ label, state: 'pending', detail: '' })),
+      collapsed: false,
+    });
+
+    let builtWidgets = [];
+
+    try {
+      for await (const { event, data } of streamChat({ prompt: msg, currentWidgets: dash.widgets, focusedWidgetId: currentFocused?.id, history })) {
+        if (event === 'step') {
+          setThreads(prev => ({
+            ...prev,
+            [dashId]: (prev[dashId] || []).map(m => m.id === stepsMid
+              ? { ...m, steps: m.steps.map((s, i) => i === data.index ? { ...s, state: data.state, detail: data.detail || '' } : s) }
+              : m
+            ),
+          }));
+        } else if (event === 'widget') {
+          builtWidgets = [...builtWidgets, data.widget];
+          setBuilding({ dashId, specs: [data.widget] });
+        } else if (event === 'clarify') {
+          patchMsg(dashId, stepsMid, { collapsed: true });
+          appendMsg(dashId, {
+            id: uid(), role: 'clarify',
+            question: data.question, chips: data.chips,
+            footnote: data.footnote, answered: false,
+          });
+        } else if (event === 'result') {
+          const isEmpty = dash.widgets.length === 0;
+          setBuilding(null);
+          setWidgets(dashId, data.widgets);
+          if (!currentFocused && isEmpty && data.dashboardName && dash.name.startsWith('Untitled')) {
+            renameDash(dashId, data.dashboardName);
+          }
+          patchMsg(dashId, stepsMid, { collapsed: true });
+          appendMsg(dashId, {
+            id: uid(), role: 'result',
+            title: data.dashboardName,
+            widgets: [],
+            intro: currentFocused ? `Updated "${currentFocused.title}".` : null,
+            chips: followupChips(data.widgets),
+          });
+        } else if (event === 'error') {
+          patchMsg(dashId, stepsMid, { collapsed: true });
+          appendMsg(dashId, { id: uid(), role: 'error', text: data.message || 'Something went wrong.' });
+        }
+      }
+    } catch (err) {
+      patchMsg(dashId, stepsMid, { collapsed: true });
+      appendMsg(dashId, { id: uid(), role: 'error', text: err.message });
+    }
+
+    setBuilding(null);
     setBusy(false);
-  }, [activeId, dashboards, busy, stepMs]);
+  }, [activeId, dashboards, busy, focusedWidget]);
 
   const onClarifyPick = (dashId, mid, chip) => {
     patchMsg(dashId, mid, { answered: true });
@@ -109,7 +188,19 @@ function App() {
     setActiveId(id);
   };
 
-  const deleteWidget = (dashId, wId) => setWidgets(dashId, active.widgets.filter(w => w.id !== wId));
+  const handleRefine = uCb((wSpec) => {
+    setFocusedWidget(wSpec);
+    const others = (dashboards.find(d => d.id === activeId)?.widgets.length || 1) - 1;
+    appendMsg(activeId, {
+      id: uid(), role: 'assistant',
+      text: `Refining "${wSpec.title}" — describe the change you want, and I'll leave your other ${others} widget${others !== 1 ? 's' : ''} untouched.`,
+    });
+  }, [activeId, dashboards]);
+
+  const deleteWidget = (dashId, wId) => {
+    if (focusedWidget && focusedWidget.id === wId) setFocusedWidget(null);
+    setWidgets(dashId, active.widgets.filter(w => w.id !== wId));
+  };
   const onReorder = (fromId, toId) => {
     const a = active.widgets.slice();
     const fi = a.findIndex(w => w.id === fromId), ti = a.findIndex(w => w.id === toId);
@@ -117,6 +208,27 @@ function App() {
     const [m] = a.splice(fi, 1); a.splice(ti, 0, m);
     setWidgets(active.id, a);
   };
+
+  // Load saved config on mount, then enable auto-save
+  uE(() => {
+    fetch('/api/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.dashboards) setDashboards(d.dashboards); })
+      .catch(() => {})
+      .finally(() => { configLoaded.current = true; });
+  }, []);
+
+  // Auto-save dashboards to config file (debounced, only after initial load)
+  uE(() => {
+    if (!configLoaded.current) return;
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dashboards }) }).catch(() => {});
+    }, 600);
+  }, [dashboards]);
+
+  // Clear focused widget when switching dashboards
+  uE(() => { setFocusedWidget(null); }, [activeId]);
 
   uE(() => {
     const onKey = (e) => { if (e.key === 'Escape') setFullscreen(false); };
@@ -146,18 +258,18 @@ function App() {
         dragId={dragId} setDragId={setDragId} onReorder={onReorder} density={t.density}
         onDeleteWidget={(wid) => deleteWidget(active.id, wid)}
         onPin={() => togglePin(active.id)} onFullscreen={() => setFullscreen(true)}
-        onSuggest={handleSubmit}
+        onSuggest={handleSubmit} onRefineWidget={handleRefine}
       />
       <CoPilotPanel
         thread={thread} dashName={active.name} widgetCount={active.widgets.length} tone={t.panelTone}
         busy={busy} input={input} setInput={setInput} onSubmit={handleSubmit}
         onClarifyPick={(mid, chip) => onClarifyPick(activeId, mid, chip)}
         onToggleSteps={(mid) => patchMsg(activeId, mid, { collapsed: !(thread.find(m => m.id === mid) || {}).collapsed })}
+        focusedWidget={focusedWidget} onExitFocus={() => setFocusedWidget(null)}
       />
       <TweaksPanel>
         <TweakSection label="Assistant" />
         <TweakRadio label="Panel tone" value={t.panelTone} options={['dark', 'eggplant', 'light']} onChange={(v) => setTweak('panelTone', v)} />
-        <TweakSlider label="AI speed" value={t.speed} min={0.5} max={2} step={0.5} unit="×" onChange={(v) => setTweak('speed', v)} />
         <TweakSection label="Canvas" />
         <TweakColor label="Accent" value={t.accent} options={['#FF4A2E', '#B5371E', '#1726EE', '#2FB67C']} onChange={(v) => setTweak('accent', v)} />
         <TweakRadio label="Density" value={t.density} options={['comfortable', 'compact']} onChange={(v) => setTweak('density', v)} />
@@ -232,7 +344,7 @@ function LeftPanel({ dashboards, activeId, collapsed, onSelect, onToggle, onNew,
 const railIconBtn = { width: 38, height: 38, borderRadius: 9, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 
 /* ===================== CANVAS ===================== */
-function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWidget, onPin, onFullscreen, onSuggest, density }) {
+function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWidget, onPin, onFullscreen, onSuggest, density, onRefineWidget }) {
   const empty = dash.widgets.length === 0 && !building;
   const gap = density === 'compact' ? 10 : 14;
   return (
@@ -265,7 +377,8 @@ function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWi
               <WidgetCard key={w.id} spec={w} dragging={dragId === w.id}
                 onDragStart={() => setDragId(w.id)} onDragEnd={() => setDragId(null)}
                 onDrop={() => { if (dragId && dragId !== w.id) onReorder(dragId, w.id); setDragId(null); }}
-                onDelete={() => onDeleteWidget(w.id)} />
+                onDelete={() => onDeleteWidget(w.id)}
+                onRefine={onRefineWidget} />
             ))}
             {building && building.specs.map((s, i) => <SkeletonFor key={'sk' + i} spec={s} />)}
           </div>
@@ -300,18 +413,31 @@ function CanvasEmpty({ onSuggest }) {
   );
 }
 
-/* One widget card with drag handle + delete */
-function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete }) {
-  const [menu, setMenu] = uS(false);
+/* One widget card with drag handle + refine + delete */
+function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete, onRefine }) {
+  const [sqlOpen, setSqlOpen] = uS(false);
   const span = spec.span || 1;
+
+  const sqlPanel = sqlOpen && spec.sql && (
+    <div style={{ marginTop: 8, padding: '10px 12px', background: 'var(--az-mist)', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
+      <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--az-eggplant)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.6 }}>{spec.sql}</pre>
+    </div>
+  );
+
+  const toolBtn = (onClick, title, icon, active) => (
+    <span onClick={onClick} title={title} style={{ cursor: 'pointer', width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: active ? 'var(--az-dark-red)' : 'var(--fg-4)', background: active ? 'var(--az-soft-red)' : 'rgba(255,255,255,0.7)' }}>
+      <i className={`ph-light ph-${icon}`} style={{ fontSize: 14 }}></i>
+    </span>
+  );
+
   const toolbar = (
     <div className="wdg-tools" style={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: 2, zIndex: 3 }}>
       <span className="wdg-grip" draggable onDragStart={onDragStart} onDragEnd={onDragEnd} title="Drag to reorder" style={{ cursor: 'grab', width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-4)', background: 'rgba(255,255,255,0.7)' }}>
         <i className="ph-light ph-dots-six" style={{ fontSize: 15 }}></i>
       </span>
-      <span onClick={() => onDelete()} title="Remove" style={{ cursor: 'pointer', width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-4)', background: 'rgba(255,255,255,0.7)' }}>
-        <i className="ph-light ph-x" style={{ fontSize: 14 }}></i>
-      </span>
+      {onRefine && toolBtn(() => onRefine(spec), 'Refine this widget', 'magic-wand', false)}
+      {spec.sql && toolBtn(() => setSqlOpen(o => !o), 'View SQL', 'code', sqlOpen)}
+      {toolBtn(() => onDelete(), 'Remove', 'x', false)}
     </div>
   );
 
@@ -325,6 +451,7 @@ function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete }
       <div className="wdg-card wdg-in" style={outer} onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
         {toolbar}
         <Kpi {...spec} />
+        {sqlPanel}
       </div>
     );
   }
@@ -340,6 +467,11 @@ function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete }
           {spec.badgeText && <Chip variant={spec.badgeVariant || 'neutral'}>{spec.badgeText}</Chip>}
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>{renderWidgetBody(spec)}</div>
+        {sqlOpen && spec.sql && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border-subtle)' }}>
+            <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--az-eggplant)', background: 'var(--az-mist)', borderRadius: 8, padding: '10px 12px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.6 }}>{spec.sql}</pre>
+          </div>
+        )}
       </div>
     </div>
   );

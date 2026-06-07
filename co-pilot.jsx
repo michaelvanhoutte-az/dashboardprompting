@@ -7,7 +7,7 @@ const TONES = {
   light:    { bg: '#fff', headBorder: 'var(--border-subtle)', title: 'var(--az-eggplant)', sub: 'var(--fg-3)', eye: 'var(--fg-3)', dark: false },
 };
 
-function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, onSubmit, onClarifyPick, onToggleSteps, tone = 'dark' }) {
+function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, onSubmit, onClarifyPick, onToggleSteps, tone = 'dark', focusedWidget, onExitFocus }) {
   const T = TONES[tone] || TONES.dark;
   const scrollRef = uRc(null);
   uEc(() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight; }, [thread, busy]);
@@ -29,6 +29,21 @@ function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, on
         <DataSourceBadge tone={T.dark ? 'dark' : 'light'} />
       </div>
 
+      {/* focused widget banner */}
+      {focusedWidget && (
+        <div style={{ padding: '8px 14px', flexShrink: 0, background: T.dark ? 'rgba(255,74,46,0.13)' : 'rgba(255,74,46,0.07)', borderBottom: '1px solid ' + (T.dark ? 'rgba(255,74,46,0.22)' : 'rgba(255,74,46,0.18)'), display: 'flex', alignItems: 'center', gap: 9 }}>
+          <i className="ph-light ph-magic-wand" style={{ fontSize: 14, color: 'var(--az-red)', flexShrink: 0 }}></i>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.dark ? 'rgba(241,238,236,0.5)' : 'var(--fg-4)', marginBottom: 1 }}>Refining widget</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: T.dark ? 'var(--az-cream)' : 'var(--fg-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{focusedWidget.title}</div>
+          </div>
+          <button onClick={onExitFocus} title="Exit refine mode" style={{ border: 'none', background: T.dark ? 'rgba(241,238,236,0.1)' : 'var(--az-mist)', cursor: 'pointer', padding: '4px 9px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+            <i className="ph-light ph-x" style={{ fontSize: 12, color: T.dark ? 'var(--az-cream)' : 'var(--fg-2)' }}></i>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: T.dark ? 'var(--az-cream)' : 'var(--fg-2)' }}>Exit</span>
+          </button>
+        </div>
+      )}
+
       {/* thread */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 6px' }}>
         {thread.length === 0 && <Greeting widgetCount={widgetCount} dashName={dashName} onSubmit={onSubmit} dark={T.dark} eye={T.eye} />}
@@ -38,11 +53,12 @@ function CoPilotPanel({ thread, dashName, widgetCount, busy, input, setInput, on
           if (m.role === 'clarify') return <ClarifyCard key={m.id} dark={T.dark} question={m.question} chips={m.chips} footnote={m.footnote} answered={m.answered} onPick={(c) => onClarifyPick(m.id, c)} />;
           if (m.role === 'result') return <ResultCard key={m.id} dark={T.dark} title={m.title} widgets={m.widgets || []} intro={m.intro} chips={m.chips} onChip={(c) => onSubmit(c)} />;
           if (m.role === 'assistant') return <AiSay key={m.id} dark={T.dark}>{m.text}</AiSay>;
+          if (m.role === 'error') return <div key={m.id} style={{ marginBottom: 10, padding: '10px 14px', borderRadius: 10, background: 'rgba(255,74,46,0.12)', border: '1px solid rgba(255,74,46,0.25)', fontFamily: 'var(--font-body)', fontSize: 13, color: T.dark ? '#FFB09D' : 'var(--az-dark-red)', display: 'flex', gap: 8, alignItems: 'flex-start' }}><i className="ph-light ph-warning" style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}></i>{m.text}</div>;
           return null;
         })}
       </div>
 
-      <InputDock value={input} setValue={setInput} onSubmit={onSubmit} busy={busy} hasThread={thread.length > 0} tone={T} />
+      <InputDock value={input} setValue={setInput} onSubmit={onSubmit} busy={busy} hasThread={thread.length > 0} tone={T} focusedWidget={focusedWidget} />
     </div>
   );
 }
@@ -74,17 +90,18 @@ function Greeting({ widgetCount, dashName, onSubmit, dark = true, eye = '#A89790
   );
 }
 
-function InputDock({ value, setValue, onSubmit, busy, hasThread, tone }) {
+function InputDock({ value, setValue, onSubmit, busy, hasThread, tone, focusedWidget }) {
   const T = tone || { dark: true, headBorder: 'rgba(241,238,236,0.1)' };
   const taRef = uRc(null);
   uEc(() => { const ta = taRef.current; if (ta) { ta.style.height = 'auto'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; } }, [value]);
   const submit = () => { if (value.trim() && !busy) onSubmit(value); };
   const onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } };
+  const placeholder = busy ? 'Working…' : focusedWidget ? `Refine "${focusedWidget.title}"…` : hasThread ? 'Ask a follow-up, or describe a new widget…' : 'Describe a dashboard or widget…';
   return (
     <div style={{ padding: '12px 16px 16px', borderTop: '1px solid ' + T.headBorder, flexShrink: 0 }}>
       <div style={{ background: '#fff', border: T.dark ? 'none' : '1px solid var(--border-subtle)', borderRadius: 14, padding: '10px 12px', boxShadow: T.dark ? '0 4px 14px rgba(0,0,0,0.18)' : 'var(--shadow-sm)', opacity: busy ? 0.7 : 1 }}>
         <textarea ref={taRef} value={value} disabled={busy} onChange={(e) => setValue(e.target.value)} onKeyDown={onKey}
-          rows={1} placeholder={busy ? 'Working…' : hasThread ? 'Ask a follow-up, or describe a new widget…' : 'Describe a dashboard or widget…'}
+          rows={1} placeholder={placeholder}
           style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontFamily: 'var(--font-body)', fontSize: 13.5, lineHeight: 1.5, color: 'var(--fg-1)', background: 'transparent', minHeight: 20, maxHeight: 120 }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
