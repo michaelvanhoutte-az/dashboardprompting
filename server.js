@@ -171,6 +171,18 @@ app.post('/api/chat', async (req, res) => {
   res.end();
 });
 
+app.post('/api/query', async (req, res) => {
+  const { sql, spec } = req.body || {};
+  if (!sql || !spec) return res.status(400).json({ error: 'sql and spec are required' });
+  try {
+    const rows = await query(DB_URL, sql, DB_SCHEMA);
+    const widget = transformWidget({ ...spec, sql }, rows);
+    res.json({ widget });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 loadSchema().then(() => {
   app.listen(PORT, () => {
     console.log(`Azumuta Dashboard Builder → http://localhost:${PORT}`);

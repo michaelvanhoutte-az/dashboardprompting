@@ -201,6 +201,12 @@ function App() {
     if (focusedWidget && focusedWidget.id === wId) setFocusedWidget(null);
     setWidgets(dashId, active.widgets.filter(w => w.id !== wId));
   };
+  const updateWidget = (dashId, widget) => {
+    setDashboards(ds => ds.map(d => d.id === dashId
+      ? { ...d, widgets: d.widgets.map(w => w.id === widget.id ? widget : w) }
+      : d
+    ));
+  };
   const onReorder = (fromId, toId) => {
     const a = active.widgets.slice();
     const fi = a.findIndex(w => w.id === fromId), ti = a.findIndex(w => w.id === toId);
@@ -257,6 +263,7 @@ function App() {
         dash={active} busy={busy} building={building && building.dashId === active.id ? building : null}
         dragId={dragId} setDragId={setDragId} onReorder={onReorder} density={t.density}
         onDeleteWidget={(wid) => deleteWidget(active.id, wid)}
+        onUpdateWidget={(widget) => updateWidget(active.id, widget)}
         onPin={() => togglePin(active.id)} onFullscreen={() => setFullscreen(true)}
         onSuggest={handleSubmit} onRefineWidget={handleRefine}
       />
@@ -344,7 +351,7 @@ function LeftPanel({ dashboards, activeId, collapsed, onSelect, onToggle, onNew,
 const railIconBtn = { width: 38, height: 38, borderRadius: 9, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 
 /* ===================== CANVAS ===================== */
-function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWidget, onPin, onFullscreen, onSuggest, density, onRefineWidget }) {
+function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWidget, onUpdateWidget, onPin, onFullscreen, onSuggest, density, onRefineWidget }) {
   const empty = dash.widgets.length === 0 && !building;
   const gap = density === 'compact' ? 10 : 14;
   return (
@@ -378,6 +385,7 @@ function Canvas({ dash, busy, building, dragId, setDragId, onReorder, onDeleteWi
                 onDragStart={() => setDragId(w.id)} onDragEnd={() => setDragId(null)}
                 onDrop={() => { if (dragId && dragId !== w.id) onReorder(dragId, w.id); setDragId(null); }}
                 onDelete={() => onDeleteWidget(w.id)}
+                onUpdate={onUpdateWidget}
                 onRefine={onRefineWidget} />
             ))}
             {building && building.specs.map((s, i) => <SkeletonFor key={'sk' + i} spec={s} />)}
@@ -414,13 +422,50 @@ function CanvasEmpty({ onSuggest }) {
 }
 
 /* One widget card with drag handle + refine + delete */
-function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete, onRefine }) {
+function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete, onRefine, onUpdate }) {
   const [sqlOpen, setSqlOpen] = uS(false);
+  const [editSql, setEditSql] = uS('');
+  const [saving, setSaving] = uS(false);
+  const [saveError, setSaveError] = uS(null);
   const span = spec.span || 1;
 
-  const sqlPanel = sqlOpen && spec.sql && (
-    <div style={{ marginTop: 8, padding: '10px 12px', background: 'var(--az-mist)', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
-      <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--az-eggplant)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.6 }}>{spec.sql}</pre>
+  const openSql = () => { setEditSql(spec.sql || ''); setSaveError(null); setSqlOpen(true); };
+  const closeSql = () => { setSqlOpen(false); setSaveError(null); };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sql: editSql, spec }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Query failed');
+      onUpdate(data.widget);
+      closeSql();
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const sqlPanel = sqlOpen && (
+    <div style={{ marginTop: 10, padding: '12px', background: 'var(--az-mist)', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
+      <textarea
+        value={editSql}
+        onChange={e => setEditSql(e.target.value)}
+        spellCheck={false}
+        rows={4}
+        style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: 1.6, color: 'var(--az-eggplant)', background: '#fff', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '8px 10px', resize: 'vertical', outline: 'none' }}
+      />
+      {saveError && <div style={{ fontFamily: 'var(--font-body)', fontSize: 11.5, color: 'var(--az-dark-red)', marginTop: 6 }}>{saveError}</div>}
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', marginTop: 8 }}>
+        <button onClick={closeSql} disabled={saving} style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600, padding: '5px 12px', borderRadius: 6, border: '1px solid var(--border-subtle)', background: '#fff', color: 'var(--fg-2)', cursor: 'pointer' }}>Cancel</button>
+        <button onClick={handleSave} disabled={saving || !editSql.trim()} style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600, padding: '5px 12px', borderRadius: 6, border: 'none', background: saving ? 'var(--az-mist)' : 'var(--az-eggplant)', color: saving ? 'var(--fg-3)' : '#fff', cursor: saving ? 'default' : 'pointer' }}>{saving ? 'Saving…' : 'Save'}</button>
+      </div>
     </div>
   );
 
@@ -436,7 +481,7 @@ function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete, 
         <i className="ph-light ph-dots-six" style={{ fontSize: 15 }}></i>
       </span>
       {onRefine && toolBtn(() => onRefine(spec), 'Refine this widget', 'magic-wand', false)}
-      {spec.sql && toolBtn(() => setSqlOpen(o => !o), 'View SQL', 'code', sqlOpen)}
+      {spec.sql != null && toolBtn(sqlOpen ? closeSql : openSql, 'Edit SQL', 'code', sqlOpen)}
       {toolBtn(() => onDelete(), 'Remove', 'x', false)}
     </div>
   );
@@ -467,11 +512,7 @@ function WidgetCard({ spec, dragging, onDragStart, onDragEnd, onDrop, onDelete, 
           {spec.badgeText && <Chip variant={spec.badgeVariant || 'neutral'}>{spec.badgeText}</Chip>}
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>{renderWidgetBody(spec)}</div>
-        {sqlOpen && spec.sql && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border-subtle)' }}>
-            <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--az-eggplant)', background: 'var(--az-mist)', borderRadius: 8, padding: '10px 12px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.6 }}>{spec.sql}</pre>
-          </div>
-        )}
+        {sqlPanel && <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border-subtle)' }}>{sqlPanel}</div>}
       </div>
     </div>
   );
