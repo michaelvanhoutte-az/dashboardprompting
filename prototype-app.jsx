@@ -188,6 +188,8 @@ function App() {
     setActiveId(id);
   };
 
+  const clearThread = () => setThreads(t => ({ ...t, [activeId]: [] }));
+
   const handleRefine = uCb((wSpec) => {
     setFocusedWidget(wSpec);
     const others = (dashboards.find(d => d.id === activeId)?.widgets.length || 1) - 1;
@@ -272,6 +274,7 @@ function App() {
         busy={busy} input={input} setInput={setInput} onSubmit={handleSubmit}
         onClarifyPick={(mid, chip) => onClarifyPick(activeId, mid, chip)}
         onToggleSteps={(mid) => patchMsg(activeId, mid, { collapsed: !(thread.find(m => m.id === mid) || {}).collapsed })}
+        onClearThread={clearThread}
         focusedWidget={focusedWidget} onExitFocus={() => setFocusedWidget(null)}
       />
       <TweaksPanel>
