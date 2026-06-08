@@ -1,6 +1,1442 @@
 {
   "dashboards": [
     {
+      "id": "dm1e81",
+      "name": "Orders per Week",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w22_gjsm",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Work Instructions",
+          "title": "Top Steps by Average Revisits",
+          "sql": "SELECT w.workinstruction_name || ' › ' || COALESCE(s.step_name, 'Step ' || (s.step_index + 1)::text) AS label, ROUND(AVG(tv.attempts)::numeric, 2) AS value FROM instruction_total_visit tv JOIN instruction_step s ON tv.instruction_step_id = s.step_id JOIN workinstruction w ON tv.workinstruction_id = w.workinstruction_id WHERE tv.deleted_at IS NULL AND s.deleted_at IS NULL AND w.deleted_at IS NULL AND tv.attempts > 1 GROUP BY label ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Product parameters in description › Hallo zegt meneer de ${description}",
+              "v": 83.33,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "20241224 Toyota Keeping partial answers › 3 bolts 7.1 Nm",
+              "v": 67,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test peripherals input & output › Procedure",
+              "v": 54,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Built-ins › Article number",
+              "v": 43,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test Dymo Printer2 › Set parameter",
+              "v": 42.6,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test Dymo Printer2 › Set parameter 2",
+              "v": 42.4,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test Dymo Printer2 › Test include other work instruction",
+              "v": 40.5,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Dummy Fischer › Number auto confirm, required valid",
+              "v": 37,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w23_3hku",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Work Instructions",
+          "title": "Top Steps by Total Revisit Count",
+          "sql": "SELECT w.workinstruction_name || ' › ' || COALESCE(s.step_name, 'Step ' || (s.step_index + 1)::text) AS label, SUM(tv.attempts) AS value FROM instruction_total_visit tv JOIN instruction_step s ON tv.instruction_step_id = s.step_id JOIN workinstruction w ON tv.workinstruction_id = w.workinstruction_id WHERE tv.deleted_at IS NULL AND s.deleted_at IS NULL AND w.deleted_at IS NULL AND tv.attempts > 1 GROUP BY label ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Toyota inspection July 19 Dummy › 4 bolts 25 Nm",
+              "v": 894,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "Toyota Dec 3 redo from non-check › 3 bolts 7 Nm",
+              "v": 416,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250507 Double check step level all defined › 3 bolts 7 Nm Non-blocking double-check (All)",
+              "v": 412,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy › Final number check with double check blocking",
+              "v": 312,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "SF/SC/SG - AIM006391-0 › Check with non-blocking double check",
+              "v": 302,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "SF/SC/SG - AIM006391-0 › 2 bolts 7.2 Nm blocking double-check autosubmit",
+              "v": 296,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy shorter › 3 bolts 7 Nm inspection high torque",
+              "v": 251,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Product parameters in description › Hallo zegt meneer de ${description}",
+              "v": 250,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w24_bu9n",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Work Instructions",
+          "title": "Step Revisit Detail",
+          "sql": "SELECT w.workinstruction_name AS \"Work Instruction\", COALESCE(s.step_name, 'Step ' || (s.step_index + 1)::text) AS \"Step\", s.block_name AS \"Block\", COUNT(tv.instruction_total_visit_id) AS \"Recordings\", ROUND(AVG(tv.attempts)::numeric, 2) AS \"Avg Attempts\", MAX(tv.attempts) AS \"Max Attempts\", SUM(tv.attempts) AS \"Total Attempts\" FROM instruction_total_visit tv JOIN instruction_step s ON tv.instruction_step_id = s.step_id JOIN workinstruction w ON tv.workinstruction_id = w.workinstruction_id WHERE tv.deleted_at IS NULL AND s.deleted_at IS NULL AND w.deleted_at IS NULL AND tv.attempts > 1 GROUP BY w.workinstruction_name, s.step_name, s.step_index, s.block_name ORDER BY \"Avg Attempts\" DESC LIMIT 10",
+          "columns": [
+            {
+              "key": "Work Instruction",
+              "label": "Work Instruction",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Step",
+              "label": "Step",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Block",
+              "label": "Block",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Recordings",
+              "label": "Recordings",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Avg Attempts",
+              "label": "Avg Attempts",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Max Attempts",
+              "label": "Max Attempts",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Total Attempts",
+              "label": "Total Attempts",
+              "mono": false,
+              "align": "left"
+            }
+          ],
+          "rows": [
+            {
+              "Work Instruction": "Product parameters in description",
+              "Step": "Hallo zegt meneer de ${description}",
+              "Block": "Product parameters in description ${workstation}",
+              "Recordings": "2",
+              "Avg Attempts": "124.00",
+              "Max Attempts": 246,
+              "Total Attempts": "248"
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Step": "i",
+              "Block": null,
+              "Recordings": "1",
+              "Avg Attempts": "102.00",
+              "Max Attempts": 102,
+              "Total Attempts": "102"
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Step": "Variant check",
+              "Block": null,
+              "Recordings": "1",
+              "Avg Attempts": "80.00",
+              "Max Attempts": 80,
+              "Total Attempts": "80"
+            },
+            {
+              "Work Instruction": "20241224 Toyota Keeping partial answers",
+              "Step": "3 bolts 7.1 Nm",
+              "Block": "Toyota Oct 22: redo work",
+              "Recordings": "1",
+              "Avg Attempts": "67.00",
+              "Max Attempts": 67,
+              "Total Attempts": "67"
+            },
+            {
+              "Work Instruction": "Test peripherals input & output",
+              "Step": "Procedure",
+              "Block": "Test peripherals input & output",
+              "Recordings": "1",
+              "Avg Attempts": "54.00",
+              "Max Attempts": 54,
+              "Total Attempts": "54"
+            },
+            {
+              "Work Instruction": "Product parameters in check",
+              "Step": "number = nice + cool",
+              "Block": "Product parameters in check",
+              "Recordings": "3",
+              "Avg Attempts": "48.67",
+              "Max Attempts": 99,
+              "Total Attempts": "146"
+            },
+            {
+              "Work Instruction": "Built-ins",
+              "Step": "Article number",
+              "Block": "Built-ins",
+              "Recordings": "1",
+              "Avg Attempts": "43.00",
+              "Max Attempts": 43,
+              "Total Attempts": "43"
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Step": "Set parameter",
+              "Block": "Test Dymo Printer2",
+              "Recordings": "5",
+              "Avg Attempts": "42.60",
+              "Max Attempts": 172,
+              "Total Attempts": "213"
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Step": "Set parameter 2",
+              "Block": "Test Dymo Printer2",
+              "Recordings": "5",
+              "Avg Attempts": "42.40",
+              "Max Attempts": 178,
+              "Total Attempts": "212"
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Step": "Test include other work instruction",
+              "Block": "Test Dymo Printer2",
+              "Recordings": "2",
+              "Avg Attempts": "40.50",
+              "Max Attempts": 71,
+              "Total Attempts": "81"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dm50sf",
+      "name": "Repeatedly Revisited Steps",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w16_ywvy",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Orders Created per Week",
+          "sql": "SELECT TO_CHAR(date_trunc('week', created_at), 'YYYY-MM-DD') AS label, COUNT(*) AS value FROM product_order WHERE deleted_at IS NULL AND created_at IS NOT NULL GROUP BY date_trunc('week', created_at) ORDER BY date_trunc('week', created_at) ASC",
+          "labels": [
+            "2018-12-31",
+            "2019-01-21",
+            "2019-01-28",
+            "2019-03-18",
+            "2019-04-29",
+            "2019-05-06",
+            "2019-08-26",
+            "2020-03-09",
+            "2020-03-16",
+            "2020-04-06",
+            "2020-04-13",
+            "2020-04-27",
+            "2020-05-04",
+            "2020-05-11",
+            "2020-06-08",
+            "2020-06-15",
+            "2020-07-06",
+            "2020-07-13",
+            "2020-07-27",
+            "2020-08-10",
+            "2020-08-24",
+            "2020-09-14",
+            "2020-09-28",
+            "2020-10-12",
+            "2020-10-19",
+            "2020-10-26",
+            "2020-11-09",
+            "2020-11-23",
+            "2021-01-25",
+            "2021-02-15",
+            "2021-03-08",
+            "2021-04-05",
+            "2021-04-19",
+            "2021-05-17",
+            "2021-05-24",
+            "2021-06-21",
+            "2021-06-28",
+            "2021-07-05",
+            "2021-07-12",
+            "2021-08-09",
+            "2021-08-16",
+            "2021-08-23",
+            "2021-08-30",
+            "2021-09-06",
+            "2021-09-13",
+            "2021-09-27",
+            "2021-10-11",
+            "2021-10-25",
+            "2021-11-01",
+            "2021-11-22",
+            "2021-11-29",
+            "2021-12-06",
+            "2021-12-13",
+            "2022-01-03",
+            "2022-01-10",
+            "2022-01-17",
+            "2022-01-24",
+            "2022-03-14",
+            "2022-04-18",
+            "2022-05-02",
+            "2022-05-30",
+            "2022-06-13",
+            "2022-06-27",
+            "2022-07-04",
+            "2022-08-01",
+            "2022-08-08",
+            "2022-08-15",
+            "2022-08-29",
+            "2022-09-05",
+            "2022-09-12",
+            "2022-10-24",
+            "2022-10-31",
+            "2022-11-07",
+            "2022-11-14",
+            "2022-11-21",
+            "2022-11-28",
+            "2023-01-02",
+            "2023-01-09",
+            "2023-01-16",
+            "2023-01-23",
+            "2023-02-13",
+            "2023-03-06",
+            "2023-03-27",
+            "2023-04-17",
+            "2023-04-24",
+            "2023-07-24",
+            "2023-10-16",
+            "2024-01-08",
+            "2024-01-15",
+            "2024-01-22",
+            "2024-01-29",
+            "2024-02-12",
+            "2024-02-26",
+            "2024-03-25",
+            "2024-04-08",
+            "2024-04-15",
+            "2024-04-22",
+            "2024-05-27",
+            "2024-06-03",
+            "2024-07-01",
+            "2024-07-22",
+            "2024-07-29",
+            "2024-08-05",
+            "2024-08-19",
+            "2024-08-26",
+            "2024-09-02",
+            "2024-10-14",
+            "2024-10-21",
+            "2024-10-28",
+            "2024-11-04",
+            "2024-11-11",
+            "2024-11-18",
+            "2024-11-25",
+            "2024-12-09",
+            "2025-01-13",
+            "2025-02-03",
+            "2025-02-17",
+            "2025-03-17",
+            "2025-03-31",
+            "2025-04-07",
+            "2025-04-14",
+            "2025-05-12",
+            "2025-05-19",
+            "2025-05-26",
+            "2025-06-02",
+            "2025-06-09",
+            "2025-06-16",
+            "2025-06-30",
+            "2025-07-07",
+            "2025-07-14",
+            "2025-07-28",
+            "2025-08-04",
+            "2025-08-11",
+            "2025-08-18",
+            "2025-08-25",
+            "2025-09-01",
+            "2025-09-08",
+            "2025-09-15",
+            "2025-09-22",
+            "2025-09-29",
+            "2025-10-20",
+            "2025-10-27",
+            "2025-11-03",
+            "2025-11-17",
+            "2025-11-24",
+            "2025-12-15",
+            "2025-12-22",
+            "2026-01-05",
+            "2026-01-12",
+            "2026-02-09",
+            "2026-03-09",
+            "2026-03-16",
+            "2026-03-23",
+            "2026-03-30",
+            "2026-04-06",
+            "2026-04-13",
+            "2026-05-25",
+            "2026-06-01"
+          ],
+          "target": null,
+          "series": [
+            {
+              "data": [
+                2,
+                2,
+                1,
+                4,
+                1,
+                3,
+                1,
+                1,
+                2,
+                1,
+                7,
+                6,
+                4,
+                3,
+                1,
+                1,
+                2,
+                3,
+                1,
+                1,
+                1,
+                2,
+                1,
+                2,
+                2,
+                4,
+                3,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                4,
+                2,
+                14,
+                11,
+                1,
+                3,
+                2,
+                3,
+                2,
+                2,
+                5,
+                2,
+                1,
+                1,
+                3,
+                3,
+                1,
+                1,
+                4,
+                13,
+                1,
+                1,
+                2,
+                2,
+                1,
+                1,
+                5,
+                1,
+                3,
+                2,
+                1,
+                369,
+                15,
+                102,
+                12,
+                3,
+                2,
+                3,
+                15,
+                8,
+                6,
+                1,
+                1,
+                4,
+                2,
+                1,
+                1,
+                1,
+                2,
+                1,
+                1,
+                3,
+                3,
+                2,
+                23,
+                18,
+                4,
+                8,
+                3,
+                4,
+                4,
+                13,
+                2,
+                1,
+                1,
+                2,
+                6,
+                10,
+                1,
+                2,
+                12,
+                10,
+                2,
+                3,
+                6,
+                4,
+                4,
+                3,
+                12,
+                1,
+                2,
+                1,
+                11,
+                16,
+                4,
+                11,
+                3,
+                1,
+                5,
+                4,
+                5,
+                21,
+                4,
+                3,
+                33,
+                25,
+                3,
+                25,
+                1,
+                2,
+                9,
+                26,
+                19,
+                35,
+                4,
+                4,
+                1,
+                2,
+                17,
+                18,
+                9,
+                1,
+                8,
+                3,
+                10,
+                34,
+                2,
+                4,
+                12,
+                5,
+                27,
+                14,
+                7,
+                2,
+                1
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w17_9h0k",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Production",
+          "title": "Orders This Week",
+          "sql": "SELECT COUNT(*) AS value FROM product_order WHERE deleted_at IS NULL AND created_at >= date_trunc('week', CURRENT_DATE)",
+          "label": "Orders This Week",
+          "value": "0",
+          "delta": null,
+          "trend": "flat",
+          "icon": "package"
+        },
+        {
+          "id": "w18_kra2",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Production",
+          "title": "Orders Last Week",
+          "sql": "SELECT COUNT(*) AS value FROM product_order WHERE deleted_at IS NULL AND created_at >= date_trunc('week', CURRENT_DATE) - INTERVAL '1 week' AND created_at < date_trunc('week', CURRENT_DATE)",
+          "label": "Orders Last Week",
+          "value": "1",
+          "delta": null,
+          "trend": "flat",
+          "icon": "package"
+        },
+        {
+          "id": "w19_pkv4",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Orders per Week (Last 12 Weeks)",
+          "sql": "SELECT TO_CHAR(date_trunc('week', created_at), 'YYYY-MM-DD') AS label, COUNT(*) AS value FROM product_order WHERE deleted_at IS NULL AND created_at IS NOT NULL AND created_at >= CURRENT_DATE - INTERVAL '12 weeks' GROUP BY date_trunc('week', created_at) ORDER BY date_trunc('week', created_at) ASC",
+          "data": [
+            {
+              "l": "2026-03-16",
+              "v": 12,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "2026-03-23",
+              "v": 5,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "2026-03-30",
+              "v": 27,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "2026-04-06",
+              "v": 14,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "2026-04-13",
+              "v": 7,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "2026-05-25",
+              "v": 2,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "2026-06-01",
+              "v": 1,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w20_oz42",
+          "type": "donut",
+          "span": 2,
+          "eyebrow": "Production",
+          "title": "Orders by Status",
+          "sql": "SELECT status AS label, COUNT(*) AS value FROM product_order WHERE deleted_at IS NULL GROUP BY status ORDER BY value DESC LIMIT 6",
+          "centerValue": "1,337",
+          "centerLabel": "Total",
+          "data": [
+            {
+              "l": "ACTIVE",
+              "v": 1045,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "",
+              "v": 189,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "COMPLETE",
+              "v": 103,
+              "c": "var(--az-yellow)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dm1ags",
+      "name": "Repeatedly Revisited Steps",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w1_zknp",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Steps with Multiple Visits",
+          "sql": "SELECT COUNT(DISTINCT instruction_step_id) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL",
+          "label": "Steps with Multiple Visits",
+          "value": "1,126",
+          "delta": null,
+          "trend": "flat",
+          "icon": "warning"
+        },
+        {
+          "id": "w2_1mrr",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Avg Revisit Attempts (Multi-Visit Steps)",
+          "sql": "SELECT ROUND(AVG(attempts)::numeric, 1) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL",
+          "label": "Avg Revisit Attempts (Multi-Visit Steps)",
+          "value": "6.20",
+          "delta": null,
+          "trend": "flat",
+          "icon": "gauge"
+        },
+        {
+          "id": "w3_hknp",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Total Revisit Events",
+          "sql": "SELECT SUM(attempts - 1) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL",
+          "label": "Total Revisit Events",
+          "value": "13.7K",
+          "delta": null,
+          "trend": "flat",
+          "icon": "timer"
+        },
+        {
+          "id": "w4_94pn",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Work Instructions Affected",
+          "sql": "SELECT COUNT(DISTINCT itv.workinstruction_id) AS value FROM instruction_total_visit itv WHERE itv.attempts > 1 AND itv.deleted_at IS NULL",
+          "label": "Work Instructions Affected",
+          "value": "187",
+          "delta": null,
+          "trend": "flat",
+          "icon": "clipboard-text"
+        },
+        {
+          "id": "w5_s6uk",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Top Work Instructions by Total Revisits",
+          "sql": "SELECT w.workinstruction_name AS label, SUM(itv.attempts - 1) AS value FROM instruction_total_visit itv JOIN workinstruction w ON w.workinstruction_id = itv.workinstruction_id WHERE itv.attempts > 1 AND itv.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Toyota inspection July 19 Dummy",
+              "v": 1453,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "SF/SC/SG - AIM006391-0",
+              "v": 1294,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test Dymo Printer2",
+              "v": 662,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota Dec 3 redo from non-check",
+              "v": 602,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy shorter",
+              "v": 548,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250507 Double check step level all defined",
+              "v": 474,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Sesam flow",
+              "v": 470,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250130 Toyota tightening result disappears blocking double check",
+              "v": 401,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w6_wc4k",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Top Steps by Avg Revisit Attempts",
+          "sql": "SELECT COALESCE(s.step_name, 'Step ' || s.step_index::text) AS label, ROUND(AVG(itv.attempts)::numeric, 2) AS value FROM instruction_total_visit itv JOIN instruction_step s ON s.step_id = itv.instruction_step_id WHERE itv.attempts > 1 AND itv.deleted_at IS NULL AND s.deleted_at IS NULL GROUP BY s.step_id, s.step_name, s.step_index ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Hallo zegt meneer de ${description}",
+              "v": 246,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "i",
+              "v": 102,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Variant check",
+              "v": 80,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Test include other work instruction",
+              "v": 71,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "number = nice + cool",
+              "v": 69.5,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "3 bolts 7.1 Nm",
+              "v": 67,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "test 3",
+              "v": 63,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Set parameter 2",
+              "v": 61.67,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w7_nlso",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Revisit Events Over Time (Monthly)",
+          "sql": "SELECT TO_CHAR(date_trunc('month', created_at), 'Mon YYYY') AS label, SUM(attempts - 1) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL AND created_at IS NOT NULL GROUP BY date_trunc('month', created_at) ORDER BY date_trunc('month', created_at) ASC LIMIT 24",
+          "labels": [
+            "Nov 2018",
+            "Jan 2019",
+            "Mar 2019",
+            "Apr 2019",
+            "May 2019",
+            "Feb 2020",
+            "Mar 2020",
+            "Apr 2020",
+            "May 2020",
+            "Jun 2020",
+            "Jul 2020",
+            "Aug 2020",
+            "Sep 2020",
+            "Oct 2020",
+            "Nov 2020",
+            "Jan 2021",
+            "Feb 2021",
+            "Mar 2021",
+            "Apr 2021",
+            "May 2021",
+            "Jun 2021",
+            "Jul 2021",
+            "Aug 2021",
+            "Sep 2021"
+          ],
+          "target": null,
+          "series": [
+            {
+              "data": [
+                3,
+                135,
+                25,
+                69,
+                49,
+                1,
+                32,
+                6,
+                89,
+                96,
+                110,
+                6,
+                23,
+                299,
+                88,
+                5,
+                16,
+                88,
+                373,
+                53,
+                69,
+                87,
+                32,
+                181
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        },
+        {
+          "id": "w8_ggkn",
+          "type": "donut",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Revisit Distribution by Attempt Count",
+          "sql": "SELECT attempts::text || ' attempts' AS label, COUNT(*) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL GROUP BY attempts ORDER BY attempts ASC LIMIT 6",
+          "centerValue": "2,138",
+          "centerLabel": "Total",
+          "data": [
+            {
+              "l": "2 attempts",
+              "v": 1137,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "3 attempts",
+              "v": 427,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "4 attempts",
+              "v": 263,
+              "c": "var(--az-yellow)"
+            },
+            {
+              "l": "5 attempts",
+              "v": 134,
+              "c": "var(--az-green-strong)"
+            },
+            {
+              "l": "6 attempts",
+              "v": 90,
+              "c": "var(--az-blue-strong)"
+            },
+            {
+              "l": "7 attempts",
+              "v": 87,
+              "c": "#8B4B6A"
+            }
+          ]
+        },
+        {
+          "id": "w9_cdep",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Revisits",
+          "title": "Most Revisited Steps — Detail",
+          "sql": "SELECT w.workinstruction_name AS \"Work Instruction\", COALESCE(s.block_name, '—') AS \"Block\", COALESCE(s.step_name, 'Step ' || s.step_index::text) AS \"Step\", COUNT(itv.instruction_total_visit_id) AS \"Recordings\", SUM(itv.attempts) AS \"Total Attempts\", ROUND(AVG(itv.attempts)::numeric, 2) AS \"Avg Attempts\", MAX(itv.attempts) AS \"Max Attempts\" FROM instruction_total_visit itv JOIN instruction_step s ON s.step_id = itv.instruction_step_id JOIN workinstruction w ON w.workinstruction_id = itv.workinstruction_id WHERE itv.attempts > 1 AND itv.deleted_at IS NULL AND s.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name, s.block_name, s.step_name, s.step_index ORDER BY \"Avg Attempts\" DESC LIMIT 10",
+          "columns": [
+            {
+              "key": "Work Instruction",
+              "label": "Work Instruction",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Block",
+              "label": "Block",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Step",
+              "label": "Step",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Recordings",
+              "label": "Recordings",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Total Attempts",
+              "label": "Total Attempts",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Avg Attempts",
+              "label": "Avg Attempts",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Max Attempts",
+              "label": "Max Attempts",
+              "mono": false,
+              "align": "left"
+            }
+          ],
+          "rows": [
+            {
+              "Work Instruction": "Product parameters in description",
+              "Block": "Product parameters in description ${workstation}",
+              "Step": "Hallo zegt meneer de ${description}",
+              "Recordings": "2",
+              "Total Attempts": "248",
+              "Avg Attempts": "124.00",
+              "Max Attempts": 246
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Block": "—",
+              "Step": "i",
+              "Recordings": "1",
+              "Total Attempts": "102",
+              "Avg Attempts": "102.00",
+              "Max Attempts": 102
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Block": "—",
+              "Step": "Variant check",
+              "Recordings": "1",
+              "Total Attempts": "80",
+              "Avg Attempts": "80.00",
+              "Max Attempts": 80
+            },
+            {
+              "Work Instruction": "20241224 Toyota Keeping partial answers",
+              "Block": "Toyota Oct 22: redo work",
+              "Step": "3 bolts 7.1 Nm",
+              "Recordings": "1",
+              "Total Attempts": "67",
+              "Avg Attempts": "67.00",
+              "Max Attempts": 67
+            },
+            {
+              "Work Instruction": "Test peripherals input & output",
+              "Block": "Test peripherals input & output",
+              "Step": "Procedure",
+              "Recordings": "1",
+              "Total Attempts": "54",
+              "Avg Attempts": "54.00",
+              "Max Attempts": 54
+            },
+            {
+              "Work Instruction": "Product parameters in check",
+              "Block": "Product parameters in check",
+              "Step": "number = nice + cool",
+              "Recordings": "3",
+              "Total Attempts": "146",
+              "Avg Attempts": "48.67",
+              "Max Attempts": 99
+            },
+            {
+              "Work Instruction": "Built-ins",
+              "Block": "Built-ins",
+              "Step": "Article number",
+              "Recordings": "1",
+              "Total Attempts": "43",
+              "Avg Attempts": "43.00",
+              "Max Attempts": 43
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Set parameter",
+              "Recordings": "5",
+              "Total Attempts": "213",
+              "Avg Attempts": "42.60",
+              "Max Attempts": 172
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Set parameter 2",
+              "Recordings": "5",
+              "Total Attempts": "212",
+              "Avg Attempts": "42.40",
+              "Max Attempts": 178
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Test include other work instruction",
+              "Recordings": "2",
+              "Total Attempts": "81",
+              "Avg Attempts": "40.50",
+              "Max Attempts": 71
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dm7l2f",
+      "name": "Work Instructions Usage",
+      "icon": "squares-four",
+      "pinned": false,
+      "widgets": [
+        {
+          "id": "w20_4til",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Total Steps with Multiple Visits",
+          "sql": "SELECT COUNT(*) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL",
+          "label": "Total Steps with Multiple Visits",
+          "value": "2,619",
+          "delta": null,
+          "trend": "flat",
+          "icon": "arrow-counter-clockwise"
+        },
+        {
+          "id": "w21_hzid",
+          "type": "kpi",
+          "span": 1,
+          "eyebrow": "Revisits",
+          "title": "Avg Attempts per Revisited Step",
+          "sql": "SELECT ROUND(AVG(attempts)::numeric, 2) AS value FROM instruction_total_visit WHERE attempts > 1 AND deleted_at IS NULL",
+          "label": "Avg Attempts per Revisited Step",
+          "value": "6.23",
+          "unit": "attempts",
+          "delta": null,
+          "trend": "flat",
+          "icon": "timer"
+        },
+        {
+          "id": "w22_u0hq",
+          "type": "table",
+          "span": 4,
+          "eyebrow": "Revisits",
+          "title": "Steps with Most Revisits by Work Instruction",
+          "sql": "SELECT w.workinstruction_name AS \"Work Instruction\", s.block_name AS \"Block\", s.step_name AS \"Step\", COUNT(tv.instruction_total_visit_id) AS \"Recordings Affected\", ROUND(AVG(tv.attempts)::numeric, 1) AS \"Avg Attempts\", MAX(tv.attempts) AS \"Max Attempts\" FROM instruction_total_visit tv JOIN instruction_step s ON tv.instruction_step_id = s.step_id JOIN workinstruction w ON tv.workinstruction_id = w.workinstruction_id WHERE tv.attempts > 1 AND tv.deleted_at IS NULL AND s.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name, s.block_name, s.step_name ORDER BY \"Avg Attempts\" DESC, \"Recordings Affected\" DESC LIMIT 10",
+          "columns": [
+            {
+              "key": "Work Instruction",
+              "label": "Work Instruction",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Block",
+              "label": "Block",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Step",
+              "label": "Step",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Recordings Affected",
+              "label": "Recordings Affected",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Avg Attempts",
+              "label": "Avg Attempts",
+              "mono": false,
+              "align": "left"
+            },
+            {
+              "key": "Max Attempts",
+              "label": "Max Attempts",
+              "mono": false,
+              "align": "left"
+            }
+          ],
+          "rows": [
+            {
+              "Work Instruction": "Product parameters in description",
+              "Block": "Product parameters in description ${workstation}",
+              "Step": "Hallo zegt meneer de ${description}",
+              "Recordings Affected": "2",
+              "Avg Attempts": "124.0",
+              "Max Attempts": 246
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Block": null,
+              "Step": "Variant check",
+              "Recordings Affected": "1",
+              "Avg Attempts": "80.0",
+              "Max Attempts": 80
+            },
+            {
+              "Work Instruction": "20241224 Toyota Keeping partial answers",
+              "Block": "Toyota Oct 22: redo work",
+              "Step": "3 bolts 7.1 Nm",
+              "Recordings Affected": "1",
+              "Avg Attempts": "67.0",
+              "Max Attempts": 67
+            },
+            {
+              "Work Instruction": "Test peripherals input & output",
+              "Block": "Test peripherals input & output",
+              "Step": "Procedure",
+              "Recordings Affected": "1",
+              "Avg Attempts": "54.0",
+              "Max Attempts": 54
+            },
+            {
+              "Work Instruction": "Work instruction with variants",
+              "Block": null,
+              "Step": "i",
+              "Recordings Affected": "2",
+              "Avg Attempts": "52.5",
+              "Max Attempts": 102
+            },
+            {
+              "Work Instruction": "Built-ins",
+              "Block": "Built-ins",
+              "Step": "Article number",
+              "Recordings Affected": "1",
+              "Avg Attempts": "43.0",
+              "Max Attempts": 43
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Set parameter",
+              "Recordings Affected": "5",
+              "Avg Attempts": "42.6",
+              "Max Attempts": 172
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Set parameter 2",
+              "Recordings Affected": "5",
+              "Avg Attempts": "42.4",
+              "Max Attempts": 178
+            },
+            {
+              "Work Instruction": "Test Dymo Printer2",
+              "Block": "Test Dymo Printer2",
+              "Step": "Test include other work instruction",
+              "Recordings Affected": "2",
+              "Avg Attempts": "40.5",
+              "Max Attempts": 71
+            },
+            {
+              "Work Instruction": "Dummy Fischer",
+              "Block": "Dummy fischer",
+              "Step": "Number auto confirm, required valid",
+              "Recordings Affected": "1",
+              "Avg Attempts": "37.0",
+              "Max Attempts": 37
+            }
+          ]
+        },
+        {
+          "id": "w23_f5jc",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Top Work Instructions by Revisited Steps",
+          "sql": "SELECT w.workinstruction_name AS label, COUNT(tv.instruction_total_visit_id) AS value FROM instruction_total_visit tv JOIN workinstruction w ON tv.workinstruction_id = w.workinstruction_id WHERE tv.attempts > 1 AND tv.deleted_at IS NULL AND w.deleted_at IS NULL GROUP BY w.workinstruction_name ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Toyota inspection July 19 Dummy",
+              "v": 361,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "SF/SC/SG - AIM006391-0",
+              "v": 238,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250918 Toyota sequence last bolt failing, navigation fails",
+              "v": 173,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Toyota inspection July 19 Dummy shorter",
+              "v": 119,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250507 Double check step level all defined",
+              "v": 73,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "App Usability Checklist",
+              "v": 72,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250130 Toyota tightening result disappears blocking double check",
+              "v": 65,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "20250619 Non-blocking andon",
+              "v": 55,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w24_69j9",
+          "type": "bar",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Top Steps by Max Attempts",
+          "sql": "SELECT COALESCE(s.step_name, 'Step ' || s.step_index::text) AS label, MAX(tv.attempts) AS value FROM instruction_total_visit tv JOIN instruction_step s ON tv.instruction_step_id = s.step_id WHERE tv.attempts > 1 AND tv.deleted_at IS NULL AND s.deleted_at IS NULL GROUP BY s.step_name, s.step_index ORDER BY value DESC LIMIT 8",
+          "data": [
+            {
+              "l": "Hallo zegt meneer de ${description}",
+              "v": 246,
+              "c": "var(--az-red)"
+            },
+            {
+              "l": "3 bolts 7 Nm",
+              "v": 241,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Set parameter 2",
+              "v": 178,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Set parameter",
+              "v": 172,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Picture check",
+              "v": 104,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "i",
+              "v": 102,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "number = nice + cool",
+              "v": 99,
+              "c": "var(--az-eggplant)"
+            },
+            {
+              "l": "Print dymo",
+              "v": 93,
+              "c": "var(--az-eggplant)"
+            }
+          ]
+        },
+        {
+          "id": "w25_qv9h",
+          "type": "line",
+          "span": 2,
+          "eyebrow": "Revisits",
+          "title": "Revisited Step Occurrences Over Time",
+          "sql": "SELECT TO_CHAR(date_trunc('month', tv.created_at), 'Mon YYYY') AS label, COUNT(*) AS value FROM instruction_total_visit tv WHERE tv.attempts > 1 AND tv.deleted_at IS NULL AND tv.created_at IS NOT NULL GROUP BY date_trunc('month', tv.created_at) ORDER BY date_trunc('month', tv.created_at) ASC LIMIT 24",
+          "labels": [
+            "Nov 2018",
+            "Jan 2019",
+            "Mar 2019",
+            "Apr 2019",
+            "May 2019",
+            "Feb 2020",
+            "Mar 2020",
+            "Apr 2020",
+            "May 2020",
+            "Jun 2020",
+            "Jul 2020",
+            "Aug 2020",
+            "Sep 2020",
+            "Oct 2020",
+            "Nov 2020",
+            "Jan 2021",
+            "Feb 2021",
+            "Mar 2021",
+            "Apr 2021",
+            "May 2021",
+            "Jun 2021",
+            "Jul 2021",
+            "Aug 2021",
+            "Sep 2021"
+          ],
+          "target": null,
+          "series": [
+            {
+              "data": [
+                2,
+                10,
+                14,
+                3,
+                23,
+                1,
+                15,
+                2,
+                25,
+                15,
+                2,
+                4,
+                2,
+                11,
+                20,
+                3,
+                2,
+                5,
+                16,
+                19,
+                18,
+                13,
+                5,
+                15
+              ],
+              "color": "var(--az-red)",
+              "fill": true
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "dm6wwv",
       "name": "Instructions by Issue Count",
       "icon": "squares-four",
